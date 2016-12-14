@@ -4,72 +4,15 @@
 <!DOCTYPE html>
 <head>
 <title>Green Fields</title>
-<script src="scripts/lib/three.min.js"></script>
-
-<script>
-    var scene, camera, renderer; // Three.js rendering basics.
-
-    var canvas; // The canvas on which the image is rendered.
-
-    // The rotating farmer
-    var farmer;
-    var rotateYSpeed = 0.02;
-
-    // Create the scene. This function is called once, as soon as the page loads.
-    // The renderer has already been created before this function is called.
-    function createWorld() {
-
-        renderer.setClearColor(0); // Set background color (0, or 0x000000, is black).
-        scene = new THREE.Scene(); // Create a new scene which we can add objects to.
-
-        // create a camera, sitting on the positive z-axis.  The camera is not part of the scene.
-        camera = new THREE.PerspectiveCamera(70, canvas.width/canvas.height, 1, 1000);
-        camera.position.y = 1.75;
-        camera.position.z = 1.5;
-
-        var light = new THREE.DirectionalLight( 0xffffff );
-        light.position.set(2, 2, 2);
-        scene.add(light);
-        // create some lights and add them to the scene.
-        var viewpointLight = new THREE.DirectionalLight( 0xffffff, 0.8 );  // a light to shine in the direction the camera faces
-        viewpointLight.position.set(0,0,1);  // shines down the z-axis
-        scene.add(viewpointLight)
-        material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
-        var loader = new THREE.JSONLoader();
-        loader.load('models/farmer.json', function(geometry) {
-            farmer = new THREE.Mesh(geometry, material);
-            farmer.position.z = -5;
-            scene.add(farmer);
-        });
-    }
-
-    // Render the scene. This is called for each frame of the animation.
-    function render() {
-        requestAnimationFrame( render );
-        farmer.rotation.y += rotateYSpeed;
-        renderer.render(scene, camera);
-    }
-
-    //----------------------------------------------------------------------------------
-
-    // The init() function is called by the onload event when the document has loaded.
-    function init() {
-        try {
-            canvas = document.getElementById("glcanvas");
-            renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true} );
-        }
-        catch (e) {
-            document.getElementById("canvas-holder").innerHTML = "<h3><b>WebGL is not available.</b><h3>";
-            return;
-        }
-
-        // create world and render scene
-        createWorld();
-        render();
-    }
-
-</script>
-
+<script src= "scripts/lib/three.min.js"></script>
+<script src= "scripts/lib/KeyboardState.js"></script>
+<script src= "scripts/lib/PointerLockControls.js"></script>
+<script src = "scripts/random.js"></script>
+<script src = "scripts/vector.js"></script>
+<script src = "scripts/world.js"></script>
+<script src = "scripts/player.js"></script>
+<script src = "scripts/tuning.js"></script>
+<script src = "scripts/game.js"></script>
 </head>
 <body onload="init()">
 <div id="canvas-holder">

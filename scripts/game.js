@@ -33,9 +33,8 @@
      viewpointLight.position.set(0,0,1);  // shines down the z-axis
      scene.add(viewpointLight)
      material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
-//      function Plane (scene, scale, texturePath, angle, u, v);
-     var plane = new Plane(scene, Vector3.one(), "img/wood.jpg", 0, 1, 1);
-     plane.position.y -= 1;
+     var plane = new Plane(scene, Vector3.scalar(100), "img/wood.jpg", new Vector3(3 * Math.PI / 2, 0, 0), 1, 1);
+     plane.position.y -= 4;
      var loader = new THREE.JSONLoader();
      loader.load('models/farmer.json',
      function(geometry) {
@@ -45,6 +44,10 @@
         farmer.rotation.y = Math.PI;
         scene.add(farmer);
         camera.add(farmer);
+        camera.rotation.x -= Math.PI / 4;
+        farmer.rotation.x += Math.PI / 4;
+        farmer.position.z -= 4;
+        farmer.position.y -= 2;
      });
  }
 

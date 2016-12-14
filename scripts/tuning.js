@@ -7,6 +7,8 @@ var playerSpeed = 1;
 var playerStrafeSpeed = 0.5;
 var playerLookSpeed = 0.01;
 
+var godModeEnabled = true;
+
 var cameraY = 10;
 var cameraZ = 20;
 var checkerBoardTexturePath = "img/checkerboard.png";
@@ -20,6 +22,10 @@ var wallHeight = 50;
 var textureYRepeat = 5;
 var textureXRepeat = 20;
 
+// Farm grid vars:
+var gridMin = -5;
+var gridMax = 5;
+var gridStep = 1;
 
 // set up a few uv coordinates
 var uvCoordinates = [new THREE.Vector2(0, 0),   // 0

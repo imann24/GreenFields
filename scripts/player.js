@@ -48,6 +48,15 @@ Player.prototype.setupMouseLook = function () {
     camera.position.y -= 5;
 }
 
+
+Player.prototype.toggleXRotationEnabled = function () {
+	this.pointerLook.toggleXRotationEnabled();
+}
+
+Player.prototype.toggleYRotationEnabled = function () {
+	this.pointerLook.toggleYRotationEnabled();
+}
+
 // Uses KeyboardState.js:
 Player.prototype.move = function () {
      keyboard.update();

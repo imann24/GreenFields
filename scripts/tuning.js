@@ -25,7 +25,7 @@ var textureXRepeat = 20;
 // Farm grid vars:
 var gridMin = -50;
 var gridMax = 50;
-var gridStep = 10;
+var gridStep = 5;
 
 // Tools
 var hoeKey = "Hoe";

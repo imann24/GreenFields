@@ -15,6 +15,11 @@ WorldObject.prototype = {
      },
 }
 
+WorldObject.prototype.setReferences = function (scene, position) {
+     this.scene = scene;
+     this.position = position;
+}
+
 WorldObject.prototype.earlySetup = function (scene, origin, scale, material, uvCoordinates, uvOrders) {
      this.geometry = new THREE.Geometry();
      this.scene = scene;
@@ -239,3 +244,163 @@ function Cube (scene, origin, scale, color) {
 }
 
 Cube.prototype = new WorldObject();
+
+function ActiveFarmObject (scene, position) {
+     this.farmObjectSetup(scene, position);
+}
+
+ActiveFarmObject.prototype = new WorldObject();
+
+ActiveFarmObject.prototype.farmObjectSetup = function (type, scene, position) {
+     this.type = type;
+     this.defaultRespondsToValue = false;
+     this.setReferences(scene, position);
+}
+
+// Override this method in the subclasses:
+ActiveFarmObject.prototype.respondsTo = function (item) {
+     return this.defaultRespondsToValue;
+}
+
+// Each farm object has a string that identifies its type
+ActiveFarmObject.prototype.getType = function () {
+     return this.type;
+}
+
+function PlantObject (scene, position, plantDescriptor) {
+     this.farmObjectSetup(scene, position);
+     this.plantDescriptor = plantDescriptor;
+}
+
+PlantObject.prototype = new ActiveFarmObject();
+
+PlantObject.prototype.plant = function () {
+     // TODO: Implement
+}
+
+PlantObject.prototype.pick = function () {
+     // TODO: Implement
+}
+
+PlantObject.prototype.water = function () {
+     // TODO: Implement
+}
+
+function FarmTile (scene, position) {
+     this.farmObjectSetup(scene, position);
+     this.isTilled = false;
+     this.plant = null;
+}
+
+FarmTile.prototype = new ActiveFarmObject();
+
+FarmTile.prototype.hasPlant = function () {
+     return this.plant != null;
+}
+
+FarmTile.prototype.till = function () {
+     this.isTilled = true;
+     // TODO: Implement
+}
+
+FarmTile.prototype.plant = function (plantObject) {
+     // TODO: Implement rest of functionality
+     this.plant = plantObject;
+     this.isTilled = false;
+}
+
+FarmTile.prototype.pickPlant = function () {
+     var pickedPlant = this.plant;
+     this.plant = null;
+     // TODO: Implement rest of functionality
+
+     return pickedPlant;
+}
+
+FarmTile.prototype.respondsTo = function (item) {
+     var itemKey = item.getType();
+     if (itemKey == hoeKey && !this.hasPlant()) {
+          return true;
+     }  else if (itemKey == seedsKey && this.isTilled) {
+          return true;
+     } else if (itemKey == wateringCanKey && this.hasPlant()) {
+          return true;
+     } else if (itemKey == basketKey && this.hasPlant()) {
+          return true;
+     } else {
+          return defaultRespondsToValue;
+     }
+}
+
+function Tool (scene, owner, toolDescriptor) {
+     this.farmObjectSetup(scene, null);
+     this.setupTool(scene, owner, toolDescriptor);
+}
+
+Tool.prototype = new ActiveFarmObject();
+
+Tool.prototype.setupTool = function (scene, owner, toolDescriptor) {
+     this.scene = scene;
+     this.owner = owner;
+     this.toolDescriptor = toolDescriptor;
+}
+
+Tool.prototype.use = function (target) {
+     console.log("Override the USE method in subclasses of Tool");
+}
+
+Tool.prototype.till = function (farmTile) {
+     // TODO: Implement
+}
+
+Tool.prototype.plant = function (farmTile) {
+     // TODO: Implement
+}
+
+Tool.prototype.water = function (plantObject) {
+     // TODO: Implement
+}
+
+Tool.prototype.pick = function (plantObject) {
+     // TODO: Implement
+}
+
+function Hoe (scene, owner, hoeDescriptor) {
+     setupTool(scene, owner, hoeDescriptor);
+}
+
+Hoe.prototype = new Tool();
+
+Hoe.prototype.use = function (target) {
+     this.till(target);
+}
+
+function Seeds (scene, owner, seedDescriptor) {
+     setupTool(scene, owner, seedDescriptor);
+}
+
+Seeds.prototype = new Tool();
+
+Seeds.prototype.use = function (target) {
+     this.plant(target);
+}
+
+function WateringCan (scene, owner, wateringCanDescriptor) {
+     setupTool(scene, owner, wateringCanDescriptor);
+}
+
+WateringCan.prototype = new Tool();
+
+WateringCan.prototype.use = function (target) {
+     this.water(target);
+}
+
+function Basket (scene, owner, basketDescriptor) {
+     setupTool(scene, owern, basketDescriptor);
+}
+
+Basket.prototype = new Tool();
+
+Basket.prototype.use = function (target) {
+     this.pick(target);
+}

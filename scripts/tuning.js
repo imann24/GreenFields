@@ -20,6 +20,15 @@ var wallHeight = 50;
 var textureYRepeat = 5;
 var textureXRepeat = 20;
 
+// Tools
+var hoeKey = "Hoe";
+var seedsKey = "Seeds";
+var wateringCanKey = "Watering Can";
+var basketKey = "Basket";
+
+// Farm Items
+var plantKey = "Plant";
+var farmTileKey = "Farm Tile";
 
 // set up a few uv coordinates
 var uvCoordinates = [new THREE.Vector2(0, 0),   // 0

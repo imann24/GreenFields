@@ -15,7 +15,6 @@
  // Create the scene. This function is called once, as soon as the page loads.
  // The renderer has already been created before this function is called.
  function createWorld() {
-
      renderer.setClearColor(0); // Set background color (0, or 0x000000, is black).
      scene = new THREE.Scene(); // Create a new scene which we can add objects to.
      keyboard = new KeyboardState();

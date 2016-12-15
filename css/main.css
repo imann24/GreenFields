@@ -1,0 +1,11 @@
+/*
+ * Author: Isaiah Mann
+ * Description: Styling for the web page
+ */
+ 
+#canvas-holder {
+     text-align: center;
+}
+#uicanvas {
+     display: block;
+}

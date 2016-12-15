@@ -1,23 +1,33 @@
 <!-- Author: Isaiah Mann, Template by Sara Mathieson -->
 <!-- Description: A simple farming game build in WebGL -->
 <!DOCTYPE html>
-<head>
-<title>Green Fields</title>
-<meta charset="utf-8"/>
-<script src= "scripts/lib/three.min.js"></script>
-<script src= "scripts/lib/KeyboardState.js"></script>
-<script src= "scripts/lib/PointerLockControls.js"></script>
-<script src = "scripts/random.js"></script>
-<script src = "scripts/vector.js"></script>
-<script src = "scripts/physics.js"></script>
-<script src = "scripts/world.js"></script>
-<script src = "scripts/player.js"></script>
-<script src = "scripts/tuning.js"></script>
-<script src = "scripts/game.js"></script>
-</head>
-<body onload="init()">
-<div id="canvas-holder">
-    <canvas id="glcanvas" width="800" height="600"></canvas>
-</div>
-</body>
+     <head>
+          <title>Green Fields</title>
+
+          <meta charset="utf-8"/>
+
+          <link rel="stylesheet" type="text/css" href="css/main.css">
+
+          <script src= "scripts/lib/three.min.js"></script>
+          <script src= "scripts/lib/KeyboardState.js"></script>
+          <script src= "scripts/lib/PointerLockControls.js"></script>
+          <script src = "scripts/random.js"></script>
+          <script src = "scripts/vector.js"></script>
+          <script src = "scripts/physics.js"></script>
+          <script src = "scripts/ui.js"></script>
+          <script src = "scripts/world.js"></script>
+          <script src = "scripts/data.js"></script>   
+          <script src = "scripts/player.js"></script>
+          <script src = "scripts/tuning.js"></script>
+          <script src = "scripts/game.js"></script>
+     </head>
+
+     <body onload="init()">
+          <div id="canvas-holder">
+              <canvas id="glcanvas" width="800" height="600">
+                   <!-- Description: UI Canvas Is Nested So that it overlays -->
+                   <canvas id="uicanvas" width="800" height="600"></canvas>
+              </canvas>
+          </div>
+     </body>
 </html>

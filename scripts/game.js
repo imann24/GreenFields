@@ -6,8 +6,11 @@
 
 var scene, camera, renderer; // Three.js rendering basics.
 var player, keyboard;
-var canvas; // The canvas on which the image is rendered.
+var worldCanvas, uiCanvas; // The canvas on which the image is rendered.
 var gridPositions;
+
+// UI
+var userInterface;
 
 // World Objects
 var world;
@@ -51,13 +54,13 @@ function initInput () {
 
 // create a camera, sitting on the positive z-axis.  The camera is not part of the scene.
 function initCamera () {
-     camera = new THREE.PerspectiveCamera(70, canvas.width/canvas.height, 1, 1000);
+     camera = new THREE.PerspectiveCamera(70, worldCanvas.width / worldCanvas.height, 1, 1000);
      camera.position.y = 1.75;
      camera.position.z = 1.5;
 }
 
 function initPlayer () {
-     player = new Player(scene, camera, canvas,
+     player = new Player(scene, camera, worldCanvas,
           playerSpeed, playerStrafeSpeed, playerLookSpeed);
      // Turn of the xRotation of the camera:
      player.toggleXRotationEnabled();
@@ -119,6 +122,23 @@ function initFarm () {
      scene.add(farm);
 }
 
+function initUserInterface () {
+     userInterface = new UserInterface(uicanvas);
+     uiCanvas = document.getElementById("uicanvas");
+}
+
+function tryInitWebGL () {
+     try {
+        worldCanvas = document.getElementById("glcanvas");
+        renderer = new THREE.WebGLRenderer( { canvas: worldCanvas, antialias: true} );
+        return true;
+     }
+     catch (e) {
+        document.getElementById("canvas-holder").innerHTML = "<h3><b>WebGL is not available.</b><h3>";
+        return false;
+     }
+}
+
  // Render the scene. This is called for each frame of the animation.
 function update() {
      requestAnimationFrame(update);
@@ -154,16 +174,11 @@ function updateRenderer () {
 
  // The init() function is called by the onload event when the document has loaded.
 function init() {
-     try {
-        canvas = document.getElementById("glcanvas");
-        renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true} );
+     if (tryInitWebGL()) {
+          // create world and render scene
+          initWorld();
+          initUserInterface();
+          // Must be called once from init to begin render loop:
+          update();
      }
-     catch (e) {
-        document.getElementById("canvas-holder").innerHTML = "<h3><b>WebGL is not available.</b><h3>";
-        return;
-     }
-
-     // create world and render scene
-     initWorld();
-     update();
 }

@@ -247,6 +247,7 @@ Plane.createGridCellAtPosition = function (scene, scale, material, angle) {
      plane.geometry = new THREE.PlaneGeometry(scale.x, scale.y);
      plane.createMesh();
      plane.setRotation(angle);
+     scene.add(plane.mesh);
      return plane;
 }
 

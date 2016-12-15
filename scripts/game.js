@@ -59,6 +59,7 @@ function initPlayer () {
         farmerModel.rotation.y = Math.PI;
         farmer = WorldObject.objectFromMesh(world, farmerModel);
         farmer.addCollider();
+        farmer.setId("Player");
         camera.add(farmerModel);
         camera.rotation.x -= Math.PI / 4;
         farmerModel.rotation.x += Math.PI / 4;
@@ -103,7 +104,9 @@ function updateInput () {
 }
 
 function updatePhysics () {
+     farmer.updateCollider();
      var collisionsWithPlayer = world.getCollisionsWithObject(farmer);
+     // TODO: Do something with the tiles that the player is colliding with
 }
 
 function updateRenderer () {

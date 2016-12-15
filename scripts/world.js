@@ -4,6 +4,9 @@
  * @requires: THREE.js
  */
 
+var instanceCount = 0;
+var idKey = "WorldObject";
+
 function World (scene) {
      this.scene = scene;
      this.worldObjects = [];
@@ -63,7 +66,8 @@ World.prototype.getCollisionsWithObject = function (object) {
 }
 
 function WorldObject () {
-     this.collider = null;
+     this.ownsCollider = false;
+     this.id = idKey + (++instanceCount);
 }
 
 WorldObject.prototype = {
@@ -81,6 +85,14 @@ WorldObject.objectFromMesh = function (world, mesh) {
      obj.mesh = mesh;
      world.add(obj);
      return obj;
+}
+
+WorldObject.prototype.getId = function () {
+     return this.id;
+}
+
+WorldObject.prototype.setId = function (newId) {
+     this.id = newId;
 }
 
 WorldObject.prototype.setReferences = function (world, position) {
@@ -208,10 +220,15 @@ WorldObject.prototype.createUVs = function (uvs) {
 }
 
 WorldObject.prototype.hasCollider = function () {
-     return this.collider != null;
+     return this.ownsCollider;
 }
 
 WorldObject.prototype.addCollider = function () {
+     this.ownsCollider = true;
+     this.updateCollider();
+}
+
+WorldObject.prototype.updateCollider = function () {
      this.collider = new THREE.Box3().setFromObject(this.mesh);
 }
 
@@ -345,6 +362,7 @@ Plane.createGrid = function (world, gridPositions, scale, texturePath, angle) {
                parent.add(plane.mesh);
                plane.setPosition(gridPositions[x][z]);
                plane.addCollider();
+               plane.setId("Tile: (" + x + ", " + z + ")");
           }
      }
      return parent;

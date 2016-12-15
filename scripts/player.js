@@ -102,6 +102,15 @@ Player.prototype.move = function () {
      if (keyboard.pressed("up") || keyboard.pressed("W")) {
           this.applyMove("z", -this.speed);
      }
+     // For debugging purposes only:
+     if (godModeEnabled) {
+          if (keyboard.pressed("space")) {
+               this.applyMove("y", this.speed);
+          }
+          if (keyboard.pressed("shift")) {
+               this.applyMove("y", -this.speed);
+          }
+     }
 }
 
 Player.prototype.applyMove = function (axis, velocity) {
@@ -112,6 +121,8 @@ Player.prototype.applyMove = function (axis, velocity) {
      } else if (axis == "x") {
           camera.position.x -= Math.sin(this.facing - Math.PI / 2) * velocity;
           camera.position.z -= Math.cos(this.facing - Math.PI / 2) * velocity;
+     } else if (axis == "y") {
+          camera.position.y += velocity;
      }
 }
 

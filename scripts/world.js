@@ -219,18 +219,55 @@ function Octahedron (scene, origin, scale, uvs, texturePath, topUVSets, bottomUV
 Octahedron.prototype = new WorldObject();
 
 function Plane (scene, scale, texturePath, angle, u, v) {
+     if (scene) {
+          this.createPlaneInScene(scene, scale,
+               texturePath, angle, u, v);
+     }
+}
+
+Plane.prototype = new WorldObject();
+
+Plane.prototype.createPlaneInScene = function (scene, scale,
+     texturePath, angle, u, v) {
      this.scene = scene;
      this.scale = scale;
      this.setRepeatingMaterialFromTexture(texturePath, u, v);
      this.angle = angle;
      this.geometry = new THREE.PlaneGeometry(scale.x, scale.y);
-     // this.material = new THREE.MeshBasicMaterial({color: this.color, side: THREE.DoubleSide});
      this.lateSetup();
-     // this.mesh.rotation.x += angle;
      this.setRotation(angle);
 }
 
-Plane.prototype = new WorldObject();
+Plane.createGridCellAtPosition = function (scene, scale, material, angle) {
+     var plane = new Plane();
+     plane.scene = scene;
+     plane.scale = scale;
+     plane.material = material;
+     plane.angle = angle;
+     plane.geometry = new THREE.PlaneGeometry(scale.x, scale.y);
+     plane.createMesh();
+     plane.setRotation(angle);
+     scene.add(plane.mesh);
+     return plane;
+}
+
+Plane.createGrid = function (scene, gridPositions, scale, texturePath, angle) {
+     var parent = new THREE.Object3D();
+     var texture = THREE.ImageUtils.loadTexture(texturePath);
+     var material = new THREE.MeshPhongMaterial({map:texture, side:THREE.DoubleSide});
+     for (var x = 0; x < gridPositions.length; x++) {
+          for (var z = 0; z < gridPositions[x].length; z++) {
+               var plane = Plane.createGridCellAtPosition(
+                    scene,
+                    scale,
+                    material,
+                    angle);
+               parent.add(plane.mesh);
+               plane.setPosition(gridPositions[x][z]);
+          }
+     }
+     return parent;
+}
 
 function Cube (scene, origin, scale, color) {
      this.scene = scene;

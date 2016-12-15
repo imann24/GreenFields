@@ -59,10 +59,23 @@ Vector3.copy = function (vector) {
      return vector.copy();
 }
 
+Vector3.grid = function (min, max, height, step) {
+     var coords = [];
+     var xIndex = 0;
+     for (var x = min; x < max; x += step) {
+          coords.push([]);
+          for (var z = min; z < max; z += step) {
+               coords[xIndex].push(new Vector3(x, height, z));
+          }
+          xIndex++;
+     }
+     return coords;
+}
+
 function Vector2 (x, y) {
      this.x = isNaN(x) ? 0 : x;
      this.y = isNaN(y) ? 0 : y;
-};
+}
 
 Vector2.prototype = new Vector();
 

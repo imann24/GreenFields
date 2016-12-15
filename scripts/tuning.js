@@ -7,6 +7,8 @@ var playerSpeed = 1;
 var playerStrafeSpeed = 0.5;
 var playerLookSpeed = 0.01;
 
+var godModeEnabled = true;
+
 var cameraY = 10;
 var cameraZ = 20;
 var checkerBoardTexturePath = "img/checkerboard.png";
@@ -19,6 +21,11 @@ var wallWidth = 200;
 var wallHeight = 50;
 var textureYRepeat = 5;
 var textureXRepeat = 20;
+
+// Farm grid vars:
+var gridMin = -50;
+var gridMax = 50;
+var gridStep = 10;
 
 // Tools
 var hoeKey = "Hoe";

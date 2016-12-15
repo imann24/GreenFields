@@ -15,6 +15,7 @@ var userInterface;
 // World Objects
 var world;
 var farmer;
+var armModel;
 var rotateYSpeed = 0.02;
 var farm;
 var currentCollision = null;
@@ -66,7 +67,7 @@ function initPlayer () {
      player.toggleXRotationEnabled();
      var material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
      var loader = new THREE.JSONLoader();
-     loader.load('models/farmer.json',
+     loader.load('models/farmer-body.json',
      function(geometry) {
         var farmerModel = new THREE.Mesh(geometry, material);
         farmerModel.position.z = -5;
@@ -80,6 +81,12 @@ function initPlayer () {
         farmerModel.rotation.x += Math.PI / 4;
         farmerModel.position.z -= 4;
         farmerModel.position.y -= 2;
+        loader.load('models/farmer-upper-arm-left.json',
+        function(geometry) {
+           armModel = new THREE.Mesh(geometry, material);
+           arm = WorldObject.objectFromMesh(world, armModel);
+           farmerModel.add(armModel);
+        });
      });
 }
 
@@ -168,6 +175,9 @@ function updatePhysics () {
 
 function updateRenderer () {
      renderer.render(scene, camera);
+     if (armModel) {
+          armModel.rotation.x += 0.1;
+     }
 }
 
  //----------------------------------------------------------------------------------

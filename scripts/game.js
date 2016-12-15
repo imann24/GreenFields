@@ -8,7 +8,9 @@ var scene, camera, renderer; // Three.js rendering basics.
 var player, keyboard;
 var canvas; // The canvas on which the image is rendered.
 var gridPositions;
-// The rotating farmer
+
+// World Objects
+var world;
 var farmer;
 var rotateYSpeed = 0.02;
 var farm;
@@ -18,6 +20,7 @@ var farm;
 function initWorld() {
      // These functions should be called in the following order in order to guarantee dependency initialization
      initScene();
+     world = new World(scene);
      initInput();
      initCamera();
      initPlayer();
@@ -50,16 +53,17 @@ function initPlayer () {
      var loader = new THREE.JSONLoader();
      loader.load('models/farmer.json',
      function(geometry) {
-        farmer = new THREE.Mesh(geometry, material);
-        farmer.position.z = -5;
-        farmer.position.y = -2.5;
-        farmer.rotation.y = Math.PI;
-        scene.add(farmer);
-        camera.add(farmer);
+        var farmerModel = new THREE.Mesh(geometry, material);
+        farmerModel.position.z = -5;
+        farmerModel.position.y = -2.5;
+        farmerModel.rotation.y = Math.PI;
+        farmer = WorldObject.objectFromMesh(world, farmerModel);
+        farmer.addCollider();
+        camera.add(farmerModel);
         camera.rotation.x -= Math.PI / 4;
-        farmer.rotation.x += Math.PI / 4;
-        farmer.position.z -= 4;
-        farmer.position.y -= 2;
+        farmerModel.rotation.x += Math.PI / 4;
+        farmerModel.position.z -= 4;
+        farmerModel.position.y -= 2;
      });
 }
 
@@ -77,7 +81,7 @@ function initLights () {
 function initFarm () {
      gridPositions = new Vector3.grid(gridMin, gridMax, 0, gridStep);
      var farm = Plane.createGrid(
-          scene,
+          world,
           gridPositions,
           Vector3.scalar(gridStep * 1),
           "img/farm.jpg",
@@ -87,9 +91,22 @@ function initFarm () {
 }
 
  // Render the scene. This is called for each frame of the animation.
-function render() {
-     requestAnimationFrame( render );
+function update() {
+     requestAnimationFrame(update);
+     updateInput();
+     updatePhysics();
+     updateRenderer();
+}
+
+function updateInput () {
      player.move();
+}
+
+function updatePhysics () {
+     var collisionsWithPlayer = world.getCollisionsWithObject(farmer);
+}
+
+function updateRenderer () {
      renderer.render(scene, camera);
 }
 
@@ -108,5 +125,5 @@ function init() {
 
      // create world and render scene
      initWorld();
-     render();
+     update();
 }

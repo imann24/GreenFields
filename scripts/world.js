@@ -4,7 +4,67 @@
  * @requires: THREE.js
  */
 
-function WorldObject () {}
+function World (scene) {
+     this.scene = scene;
+     this.worldObjects = [];
+}
+
+World.prototype.add = function (worldObject) {
+     this.scene.add(worldObject.mesh);
+     this.worldObjects.push(worldObject);
+}
+
+World.prototype.getObjectsWithColliders = function () {
+     var objectsWithColliders = [];
+     for (var i = 0; i < this.worldObjects.length; i++) {
+          var currentObject = this.worldObjects[i];
+          if (currentObject.hasCollider()) {
+               objectsWithColliders.push(currentObject);
+          }
+     }
+     return objectsWithColliders;
+}
+
+World.prototype.getAllCollisions = function () {
+     var objects = this.getObjectsWithColliders();
+     var collisions = [];
+     var collisionHash = {};
+     for (var i = 0; i < objects.length; i++) {
+          collisionHash[i] = [];
+          for (var j = 0; j < objects.length; j++) {
+               // Don't compare this object to itself
+               if (i == j ||
+                    (collisionHash[j] &&
+                         collisionHash[j].includes(i))) {
+                    continue;
+               } else if (objects[i].isCollidingWith(objects[j])){
+                    collisions.push(
+                         new Collision(objects[i], objects[j]));
+                    collisionHash[i].push(j);
+               }
+          }
+     }
+     return collisions;
+}
+
+World.prototype.getCollisionsWithObject = function (object) {
+     var collisions = [];
+     if (object.hasCollider()) {
+          var allColliders = this.getObjectsWithColliders();
+          for (var i = 0; i < allColliders.length; i++) {
+               if (object === allColliders[i]) {
+                    continue;
+               } else if (object.isCollidingWith(allColliders[i])) {
+                    collisions.push(allColliders[i]);
+               }
+          }
+     }
+     return collisions;
+}
+
+function WorldObject () {
+     this.collider = null;
+}
 
 WorldObject.prototype = {
      get position  () {
@@ -15,14 +75,22 @@ WorldObject.prototype = {
      },
 }
 
-WorldObject.prototype.setReferences = function (scene, position) {
-     this.scene = scene;
+// Static constructor to create an object from an already created mesh
+WorldObject.objectFromMesh = function (world, mesh) {
+     var obj = new WorldObject();
+     obj.mesh = mesh;
+     world.add(obj);
+     return obj;
+}
+
+WorldObject.prototype.setReferences = function (world, position) {
+     this.world = world;
      this.position = position;
 }
 
-WorldObject.prototype.earlySetup = function (scene, origin, scale, material, uvCoordinates, uvOrders) {
+WorldObject.prototype.earlySetup = function (world, origin, scale, material, uvCoordinates, uvOrders) {
      this.geometry = new THREE.Geometry();
-     this.scene = scene;
+     this.world = world;
      this.origin = origin;
      this.scale = scale;
      this.children = [];
@@ -35,7 +103,7 @@ WorldObject.prototype.earlySetup = function (scene, origin, scale, material, uvC
 
 WorldObject.prototype.lateSetup = function () {
      this.createMesh();
-     this.addToScene();
+     this.addToWorld();
      if (this.origin) {
           this.setPositionToOrigin();
      }
@@ -69,8 +137,8 @@ WorldObject.prototype.createMesh = function () {
      this.mesh = new THREE.Mesh(this.geometry, this.material)
 }
 
-WorldObject.prototype.addToScene = function () {
-     this.scene.add(this.mesh);
+WorldObject.prototype.addToWorld = function () {
+     this.world.add(this);
 }
 
 WorldObject.prototype.setOrigin = function () {
@@ -139,9 +207,21 @@ WorldObject.prototype.createUVs = function (uvs) {
      console.log("this.createUVs() should be overriden in subclass of WorldObject");
 }
 
+WorldObject.prototype.hasCollider = function () {
+     return this.collider != null;
+}
+
+WorldObject.prototype.addCollider = function () {
+     this.collider = new THREE.Box3().setFromObject(this.mesh);
+}
+
+WorldObject.prototype.isCollidingWith = function (worldObject) {
+     return this.collider.intersectsBox(worldObject.collider);
+}
+
 // Origin and scale should be Vector3 objects. Origin is the center of the base
-function Pyramid (scene, origin, scale, material, uvCoordinates, uvOrders) {
-     this.earlySetup(scene, origin, scale, material, uvCoordinates, uvOrders);
+function Pyramid (world, origin, scale, material, uvCoordinates, uvOrders) {
+     this.earlySetup(world, origin, scale, material, uvCoordinates, uvOrders);
      this.createVertices();
      this.createFaces();
      this.createUVs(this.uvs, this.uvOrders);
@@ -201,13 +281,13 @@ Pyramid.prototype.createMaterial = function () {
      ]);
 }
 
-function Octahedron (scene, origin, scale, uvs, texturePath, topUVSets, bottomUVSets) {
+function Octahedron (world, origin, scale, uvs, texturePath, topUVSets, bottomUVSets) {
      this.mesh = new THREE.Object3D();
      this.material = this.loadMaterialFromTexture(texturePath);
      var pyramidScale = scale.copy();
      pyramidScale.y /= 1.5;
-     this.topPyramid = new Pyramid(scene, Vector3.zero(), pyramidScale, this.material, uvs, topUVSets);
-     this.bottomPryamid = new Pyramid(scene, Vector3.zero(), pyramidScale, this.material, uvs, bottomUVSets);
+     this.topPyramid = new Pyramid(world, Vector3.zero(), pyramidScale, this.material, uvs, topUVSets);
+     this.bottomPryamid = new Pyramid(world, Vector3.zero(), pyramidScale, this.material, uvs, bottomUVSets);
      this.bottomPryamid.rotation.x = Math.PI;
      this.mesh.add(this.topPyramid.mesh);
      this.mesh.add(this.bottomPryamid.mesh);
@@ -218,16 +298,16 @@ function Octahedron (scene, origin, scale, uvs, texturePath, topUVSets, bottomUV
 
 Octahedron.prototype = new WorldObject();
 
-function Plane (scene, scale, texturePath, angle, u, v) {
-     if (scene) {
-          this.createPlaneInScene(scene, scale,
+function Plane (world, scale, texturePath, angle, u, v) {
+     if (world) {
+          this.createPlaneInScene(world, scale,
                texturePath, angle, u, v);
      }
 }
 
 Plane.prototype = new WorldObject();
 
-Plane.prototype.createPlaneInScene = function (scene, scale,
+Plane.prototype.createPlaneInScene = function (world, scale,
      texturePath, angle, u, v) {
      this.scene = scene;
      this.scale = scale;
@@ -238,39 +318,40 @@ Plane.prototype.createPlaneInScene = function (scene, scale,
      this.setRotation(angle);
 }
 
-Plane.createGridCellAtPosition = function (scene, scale, material, angle) {
+Plane.createGridCellAtPosition = function (world, scale, material, angle) {
      var plane = new Plane();
-     plane.scene = scene;
+     plane.world = world;
      plane.scale = scale;
      plane.material = material;
      plane.angle = angle;
      plane.geometry = new THREE.PlaneGeometry(scale.x, scale.y);
      plane.createMesh();
      plane.setRotation(angle);
-     scene.add(plane.mesh);
+     world.add(plane);
      return plane;
 }
 
-Plane.createGrid = function (scene, gridPositions, scale, texturePath, angle) {
+Plane.createGrid = function (world, gridPositions, scale, texturePath, angle) {
      var parent = new THREE.Object3D();
      var texture = THREE.ImageUtils.loadTexture(texturePath);
      var material = new THREE.MeshPhongMaterial({map:texture, side:THREE.DoubleSide});
      for (var x = 0; x < gridPositions.length; x++) {
           for (var z = 0; z < gridPositions[x].length; z++) {
                var plane = Plane.createGridCellAtPosition(
-                    scene,
+                    world,
                     scale,
                     material,
                     angle);
                parent.add(plane.mesh);
                plane.setPosition(gridPositions[x][z]);
+               plane.addCollider();
           }
      }
      return parent;
 }
 
-function Cube (scene, origin, scale, color) {
-     this.scene = scene;
+function Cube (world, origin, scale, color) {
+     this.world = world;
      this.origin = origin;
      this.scale = scale;
      this.color = color;
@@ -282,8 +363,8 @@ function Cube (scene, origin, scale, color) {
 
 Cube.prototype = new WorldObject();
 
-function ActiveFarmObject (scene, position) {
-     this.farmObjectSetup(scene, position);
+function ActiveFarmObject (world, position) {
+     this.farmObjectSetup(world, position);
 }
 
 ActiveFarmObject.prototype = new WorldObject();
@@ -304,8 +385,8 @@ ActiveFarmObject.prototype.getType = function () {
      return this.type;
 }
 
-function PlantObject (scene, position, plantDescriptor) {
-     this.farmObjectSetup(scene, position);
+function PlantObject (world, position, plantDescriptor) {
+     this.farmObjectSetup(world, position);
      this.plantDescriptor = plantDescriptor;
 }
 
@@ -323,8 +404,8 @@ PlantObject.prototype.water = function () {
      // TODO: Implement
 }
 
-function FarmTile (scene, position) {
-     this.farmObjectSetup(scene, position);
+function FarmTile (world, position) {
+     this.farmObjectSetup(world, position);
      this.isTilled = false;
      this.plant = null;
 }
@@ -369,15 +450,15 @@ FarmTile.prototype.respondsTo = function (item) {
      }
 }
 
-function Tool (scene, owner, toolDescriptor) {
-     this.farmObjectSetup(scene, null);
-     this.setupTool(scene, owner, toolDescriptor);
+function Tool (world, owner, toolDescriptor) {
+     this.farmObjectSetup(world, null);
+     this.setupTool(world, owner, toolDescriptor);
 }
 
 Tool.prototype = new ActiveFarmObject();
 
-Tool.prototype.setupTool = function (scene, owner, toolDescriptor) {
-     this.scene = scene;
+Tool.prototype.setupTool = function (world, owner, toolDescriptor) {
+     this.world = world;
      this.owner = owner;
      this.toolDescriptor = toolDescriptor;
 }
@@ -402,8 +483,8 @@ Tool.prototype.pick = function (plantObject) {
      // TODO: Implement
 }
 
-function Hoe (scene, owner, hoeDescriptor) {
-     setupTool(scene, owner, hoeDescriptor);
+function Hoe (world, owner, hoeDescriptor) {
+     setupTool(world, owner, hoeDescriptor);
 }
 
 Hoe.prototype = new Tool();
@@ -412,8 +493,8 @@ Hoe.prototype.use = function (target) {
      this.till(target);
 }
 
-function Seeds (scene, owner, seedDescriptor) {
-     setupTool(scene, owner, seedDescriptor);
+function Seeds (world, owner, seedDescriptor) {
+     setupTool(world, owner, seedDescriptor);
 }
 
 Seeds.prototype = new Tool();
@@ -422,8 +503,8 @@ Seeds.prototype.use = function (target) {
      this.plant(target);
 }
 
-function WateringCan (scene, owner, wateringCanDescriptor) {
-     setupTool(scene, owner, wateringCanDescriptor);
+function WateringCan (world, owner, wateringCanDescriptor) {
+     setupTool(world, owner, wateringCanDescriptor);
 }
 
 WateringCan.prototype = new Tool();
@@ -432,8 +513,8 @@ WateringCan.prototype.use = function (target) {
      this.water(target);
 }
 
-function Basket (scene, owner, basketDescriptor) {
-     setupTool(scene, owern, basketDescriptor);
+function Basket (world, owner, basketDescriptor) {
+     setupTool(world, owern, basketDescriptor);
 }
 
 Basket.prototype = new Tool();

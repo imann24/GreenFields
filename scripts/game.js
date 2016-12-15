@@ -16,6 +16,7 @@ var userInterface;
 var world;
 var farmer;
 var armModel;
+var upperArm;
 var rotateYSpeed = 0.02;
 var farm;
 var currentCollision = null;
@@ -77,16 +78,26 @@ function initPlayer () {
         farmer.addCollider();
         farmer.setId("Player");
         camera.add(farmerModel);
-        camera.rotation.x -= Math.PI / 4;
-        farmerModel.rotation.x += Math.PI / 4;
-        farmerModel.position.z -= 4;
-        farmerModel.position.y -= 2;
         loader.load('models/farmer-upper-arm-left.json',
         function(geometry) {
            armModel = new THREE.Mesh(geometry, material);
            arm = WorldObject.objectFromMesh(world, armModel);
+           arm.position.y += 3.75;
+           arm.position.x += 0.9;
            farmerModel.add(armModel);
+           loader.load('models/farmer-lower-arm-left.json',
+           function(geometry) {
+              var upperArmModel = new THREE.Mesh(geometry, material);
+              upperArm = WorldObject.objectFromMesh(world, upperArmModel);
+              armModel.add(upperArmModel);
+              upperArm.position.y -= 1;
+              upperArm.position.x += 0.125;
+         });
         });
+        camera.rotation.x -= Math.PI / 4;
+        farmerModel.rotation.x += Math.PI / 4;
+        farmerModel.position.z -= 4;
+        farmerModel.position.y -= 2;
      });
 }
 
@@ -96,9 +107,7 @@ function createPlant (position) {
      loader.load('models/sprout.json',
      function(geometry) {
         var sprout = new THREE.Mesh(geometry, material);
-        // sprout.scale.x = 0.5;
         sprout.scale.y = 0.25;
-        // sprout.scale.z = 0.5;
         sprout.position.y -= 4;
         sprout.position.x = position.x;
         sprout.position.z = position.z;
@@ -175,9 +184,6 @@ function updatePhysics () {
 
 function updateRenderer () {
      renderer.render(scene, camera);
-     if (armModel) {
-          armModel.rotation.x += 0.1;
-     }
 }
 
  //----------------------------------------------------------------------------------

@@ -18,6 +18,7 @@ var currentCollision = null;
 
 var roughDirtTexture;
 var tilledDirtTexture;
+var plantTexture;
 
 // Create the scene. This function is called once, as soon as the page loads.
 // The renderer has already been created before this function is called.
@@ -36,6 +37,7 @@ function initWorld() {
 function initTextures () {
      roughDirtTexture = THREE.ImageUtils.loadTexture("img/dirt.jpg");
      tilledDirtTexture = THREE.ImageUtils.loadTexture("img/tilled-dirt.jpg");
+     plantTexture = THREE.ImageUtils.loadTexture("img/plant.jpg");
 }
 
 function initScene () {
@@ -59,7 +61,7 @@ function initPlayer () {
           playerSpeed, playerStrafeSpeed, playerLookSpeed);
      // Turn of the xRotation of the camera:
      player.toggleXRotationEnabled();
-     material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
+     var material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
      var loader = new THREE.JSONLoader();
      loader.load('models/farmer.json',
      function(geometry) {
@@ -75,6 +77,22 @@ function initPlayer () {
         farmerModel.rotation.x += Math.PI / 4;
         farmerModel.position.z -= 4;
         farmerModel.position.y -= 2;
+     });
+}
+
+function createPlant (position) {
+     var loader = new THREE.JSONLoader();
+     var material = new THREE.MeshLambertMaterial({ map: plantTexture});
+     loader.load('models/sprout.json',
+     function(geometry) {
+        var sprout = new THREE.Mesh(geometry, material);
+        // sprout.scale.x = 0.5;
+        sprout.scale.y = 0.25;
+        // sprout.scale.z = 0.5;
+        sprout.position.y -= 4;
+        sprout.position.x = position.x;
+        sprout.position.z = position.z;
+        scene.add(sprout);
      });
 }
 
@@ -112,9 +130,9 @@ function update() {
 function updateInput () {
      player.move();
      if (keyboard.down("F") && currentCollision) {
-          console.log(currentCollision);
           currentCollision.mesh.material.map = tilledDirtTexture;
           currentCollision.mesh.material.needsUpdate = true;
+          createPlant(currentCollision.position);
      }
 }
 

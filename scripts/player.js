@@ -26,10 +26,40 @@ Player.prototype = {
      get facing () {
           return this.camera.rotation.y;
      },
+     get position () {
+          return ths.camera.position;
+     },
 }
 
 Player.prototype.setup = function () {
      this.setupMouseLook();
+}
+
+Player.prototype.setupInventory = function () {
+     this.inventory = [];
+     this.equippedTool = null;
+}
+
+Player.prototype.equipTool = function (indexInInventory) {
+     if (indexInInventory >= 0 && indexInInventory < inventory.length) {
+          if (inventory[indexInInventory].isTool()) {
+               this.equippedTool = inventory[indexInInventory];
+          }
+     }
+}
+
+Player.prototype.unequipTool = function () {
+     this.equippedTool = null;
+}
+
+Player.prototype.hasToolEquipped = function () {
+     return equippedTool != null;
+}
+
+Player.prototype.useTool = function (target) {
+     if (target.respondsTo(this.equippedTool)) {
+          this.equippedTool.use(target);
+     }
 }
 
 Player.prototype.getMousePos = function (canvas, evt) {

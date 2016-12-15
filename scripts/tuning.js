@@ -27,6 +27,16 @@ var gridMin = -5;
 var gridMax = 5;
 var gridStep = 1;
 
+// Tools
+var hoeKey = "Hoe";
+var seedsKey = "Seeds";
+var wateringCanKey = "Watering Can";
+var basketKey = "Basket";
+
+// Farm Items
+var plantKey = "Plant";
+var farmTileKey = "Farm Tile";
+
 // set up a few uv coordinates
 var uvCoordinates = [new THREE.Vector2(0, 0),   // 0
                          new THREE.Vector2(1, 0),   // 1

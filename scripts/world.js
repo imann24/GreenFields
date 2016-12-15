@@ -15,7 +15,7 @@ WorldObject.prototype = {
      },
 }
 
-WorldObject.prototype.setReferences (scene, position) {
+WorldObject.prototype.setReferences = function (scene, position) {
      this.scene = scene;
      this.position = position;
 }
@@ -251,7 +251,7 @@ function ActiveFarmObject (scene, position) {
 
 ActiveFarmObject.prototype = new WorldObject();
 
-ActiveFarmObject.prototype.farmObjectSetup (type, scene, position) {
+ActiveFarmObject.prototype.farmObjectSetup = function (type, scene, position) {
      this.type = type;
      this.defaultRespondsToValue = false;
      this.setReferences(scene, position);
@@ -322,7 +322,7 @@ FarmTile.prototype.respondsTo = function (item) {
      if (itemKey == hoeKey && !this.hasPlant()) {
           return true;
      }  else if (itemKey == seedsKey && this.isTilled) {
-
+          return true;
      } else if (itemKey == wateringCanKey && this.hasPlant()) {
           return true;
      } else if (itemKey == basketKey && this.hasPlant()) {
@@ -333,35 +333,35 @@ FarmTile.prototype.respondsTo = function (item) {
 }
 
 function Tool (scene, owner, toolDescriptor) {
-     farmObjectSetup(scene, owner.position);
-     setupTool(scene, owner, toolDescriptor);
+     this.farmObjectSetup(scene, null);
+     this.setupTool(scene, owner, toolDescriptor);
 }
 
 Tool.prototype = new ActiveFarmObject();
 
-Tool.prototype.setupTool (scene, owner, toolDescriptor) {
+Tool.prototype.setupTool = function (scene, owner, toolDescriptor) {
      this.scene = scene;
      this.owner = owner;
      this.toolDescriptor = toolDescriptor;
 }
 
-Tool.prototype.use (target) {
+Tool.prototype.use = function (target) {
      console.log("Override the USE method in subclasses of Tool");
 }
 
-Tool.prototype.till (farmTile) {
+Tool.prototype.till = function (farmTile) {
      // TODO: Implement
 }
 
-Tool.prototype.plant (farmTile) {
+Tool.prototype.plant = function (farmTile) {
      // TODO: Implement
 }
 
-Tool.prototype.water (plantObject) {
+Tool.prototype.water = function (plantObject) {
      // TODO: Implement
 }
 
-Tool.prototype.pick (plantObject) {
+Tool.prototype.pick = function (plantObject) {
      // TODO: Implement
 }
 

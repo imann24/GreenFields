@@ -351,9 +351,9 @@ Plane.createGridCellAtPosition = function (world, scale, material, angle) {
 Plane.createGrid = function (world, gridPositions, scale, texturePath, angle) {
      var parent = new THREE.Object3D();
      var texture = THREE.ImageUtils.loadTexture(texturePath);
-     var material = new THREE.MeshPhongMaterial({map:texture, side:THREE.DoubleSide});
      for (var x = 0; x < gridPositions.length; x++) {
           for (var z = 0; z < gridPositions[x].length; z++) {
+               var material = new THREE.MeshPhongMaterial({map:texture, side:THREE.DoubleSide});
                var plane = Plane.createGridCellAtPosition(
                     world,
                     scale,

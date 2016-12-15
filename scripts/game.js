@@ -14,11 +14,16 @@ var world;
 var farmer;
 var rotateYSpeed = 0.02;
 var farm;
+var currentCollision = null;
+
+var roughDirtTexture;
+var tilledDirtTexture;
 
 // Create the scene. This function is called once, as soon as the page loads.
 // The renderer has already been created before this function is called.
 function initWorld() {
      // These functions should be called in the following order in order to guarantee dependency initialization
+     initTextures();
      initScene();
      world = new World(scene);
      initInput();
@@ -26,6 +31,11 @@ function initWorld() {
      initPlayer();
      initLights();
      initFarm();
+}
+
+function initTextures () {
+     roughDirtTexture = THREE.ImageUtils.loadTexture("img/dirt.jpg");
+     tilledDirtTexture = THREE.ImageUtils.loadTexture("img/tilled-dirt.jpg");
 }
 
 function initScene () {
@@ -85,7 +95,7 @@ function initFarm () {
           world,
           gridPositions,
           Vector3.scalar(gridStep * 1),
-          "img/farm.jpg",
+          "img/dirt.jpg",
           new Vector3(3 * Math.PI / 2, 0, 0));
      farm.position.y -= 4;
      scene.add(farm);
@@ -94,19 +104,28 @@ function initFarm () {
  // Render the scene. This is called for each frame of the animation.
 function update() {
      requestAnimationFrame(update);
-     updateInput();
      updatePhysics();
+     updateInput();
      updateRenderer();
 }
 
 function updateInput () {
      player.move();
+     if (keyboard.down("F") && currentCollision) {
+          console.log(currentCollision);
+          currentCollision.mesh.material.map = tilledDirtTexture;
+          currentCollision.mesh.material.needsUpdate = true;
+     }
 }
 
 function updatePhysics () {
-     farmer.updateCollider();
-     var collisionsWithPlayer = world.getCollisionsWithObject(farmer);
-     // TODO: Do something with the tiles that the player is colliding with
+     // Farmer needs a few extra frames to load (async)
+     if (farmer) {
+          farmer.updateCollider();
+          var collisionsWithPlayer = world.getCollisionsWithObject(farmer);
+          // Just pick the first collision in the list:
+          currentCollision = collisionsWithPlayer[0];
+     }
 }
 
 function updateRenderer () {

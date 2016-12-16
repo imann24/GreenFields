@@ -24,7 +24,7 @@ function LimbPair (leftLimb, rightLimb) {
 
 LimbPair.prototype.setMovement = function (framesPerStep, maxAngle, leftForward) {
      this.framesPerStep = framesPerStep;
-     this.maxAngle;
+     this.maxAngle = maxAngle;
      this.currentFrameInStep = 0;
      this.leftForward = leftForward;
      this.setLimbDirection();
@@ -52,8 +52,6 @@ LimbPair.prototype.updateMovement = function () {
           this.beginNewStep();
      }
      var progress = this.currentFrameInStep / this.framesPerStep;
-     var forwardLimb;
-     var backLimb;
      if (progress < 0.5) {
           this.extendMovement(progress * 2);
      } else {
@@ -61,16 +59,22 @@ LimbPair.prototype.updateMovement = function () {
      }
 }
 
+LimbPair.prototype.resetMovement = function () {
+     this.leftLimb.rotation.x = 0;
+     this.rightLimb.rotation.x = 0;
+     this.currentFrameInStep = 0;
+}
+
 // Extend progress is half of overall progress
 LimbPair.prototype.extendMovement = function (progress) {
-     this.forwardLimb.rotation.x = Math.lerp(0, maxAngle, progress);
-     this.backLimb.rotation.x = Math.lerp(0, -maxAngle, progress);
+     this.forwardLimb.rotation.x = Math.lerp(0, this.maxAngle, progress);
+     this.backLimb.rotation.x = Math.lerp(0, -this.maxAngle, progress);
 }
 
 // Rectract progress is half of overall progress
 LimbPair.prototype.retractMovement = function (progress) {
-     this.forwardLimb.rotation.x = Math.lerp(0, -maxAngle, progress);
-     this.backLimb.rotation.x = Math.lerp(-maxAngle, 0, progress);
+     this.forwardLimb.rotation.x = Math.lerp(this.maxAngle, 0, progress);
+     this.backLimb.rotation.x = Math.lerp(-this.maxAngle, 0, progress);
 }
 
 function Body (arms, legs) {
@@ -81,4 +85,9 @@ function Body (arms, legs) {
 Body.prototype.walk = function () {
      this.arms.updateMovement();
      this.legs.updateMovement();
+}
+
+Body.prototype.resetLimbs = function () {
+     this.arms.resetMovement();
+     this.legs.resetMovement();
 }

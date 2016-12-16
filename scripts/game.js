@@ -31,6 +31,7 @@ var currentCollision = null;
 var roughDirtTexture;
 var tilledDirtTexture;
 var plantTexture;
+var playerWasWalking = false;
 
 // Create the scene. This function is called once, as soon as the page loads.
 // The renderer has already been created before this function is called.
@@ -104,11 +105,11 @@ function initLeftArm (loader, material) {
         farmer.addChild(leftArm);
         loader.load('models/farmer-lower-arm-left.json',
         function(geometry) {
-               var upperLeftArmModel = new THREE.Mesh(geometry, material);
-               upperLeftArm = WorldObject.objectFromMesh(world, upperLeftArmModel);
-               leftArm.addChild(upperLeftArm);
-               upperLeftArm.position.y -= 1;
-               upperLeftArm.position.x += 0.125;
+               var lowerLeftArmModel = new THREE.Mesh(geometry, material);
+               lowerLeftArm = WorldObject.objectFromMesh(world, lowerLeftArmModel);
+               leftArm.addChild(lowerLeftArm);
+               lowerLeftArm.position.y -= 1;
+               lowerLeftArm.position.x += 0.125;
                initRightArm(loader, material, leftArm);
           });
      });
@@ -120,15 +121,15 @@ function initRightArm (loader, material, leftArm) {
         rightArmModel = new THREE.Mesh(geometry, material);
         rightArm = WorldObject.objectFromMesh(world, rightArmModel);
         rightArm.position.y += 3.75;
-        rightArm.position.x += 0.9;
+        rightArm.position.x -= 0.9;
         farmer.addChild(rightArm);
         loader.load('models/farmer-lower-arm-right.json',
         function(geometry) {
-               var upperRightArmModel = new THREE.Mesh(geometry, material);
-               upperRightArm = WorldObject.objectFromMesh(world, upperRightArmModel);
-               rightArm.addChild(upperRightArm);
-               upperRightArm.position.y -= 1;
-               upperRightArm.position.x += 0.125;
+               var lowerRightArmModel = new THREE.Mesh(geometry, material);
+               lowerRightArm = WorldObject.objectFromMesh(world, lowerRightArmModel);
+               rightArm.addChild(lowerRightArm);
+               lowerRightArm.position.y -= 1;
+               lowerRightArm.position.x -= 0.125;
                initLeftLeg(loader, material, leftArm, rightArm);
           });
      });
@@ -139,16 +140,18 @@ function initLeftLeg (loader, material, leftArm, rightArm) {
      function(geometry) {
         leftLegModel = new THREE.Mesh(geometry, material);
         leftLeg = WorldObject.objectFromMesh(world, leftLegModel);
-        leftLeg.position.y += 3.75;
-        leftLeg.position.x += 0.9;
+        leftLeg.position.y += 2.0;
+        leftLeg.position.x += 0.5;
+        leftLeg.scale.y = 2;
         farmer.addChild(leftLeg);
         loader.load('models/farmer-lower-leg-left.json',
         function(geometry) {
-               var upperLeftLegModel = new THREE.Mesh(geometry, material);
-               upperLeftLeg = WorldObject.objectFromMesh(world, upperLegLeftModel);
-               leftLeg.addChild(upperLeftLeg);
-               upperLeftLeg.position.y -= 1;
-               upperLeftLeg.position.x += 0.125;
+               var lowerLeftLegModel = new THREE.Mesh(geometry, material);
+               lowerLeftLeg = WorldObject.objectFromMesh(world, lowerLeftLegModel);
+               leftLeg.addChild(lowerLeftLeg);
+               lowerLeftLeg.position.y -= 0.85;
+               lowerLeftLeg.position.z += 0.05;
+               lowerLeftLeg.position.x -= 0.1;
                initRightLeg(loader, material, leftArm, rightArm, leftLeg);
           });
      });
@@ -159,15 +162,17 @@ function initRightLeg (loader, material, leftArm, rightArm, leftLeg) {
      function(geometry) {
         rightLegModel = new THREE.Mesh(geometry, material);
         rightLeg = WorldObject.objectFromMesh(world, rightLegModel);
-        rightLeg.position.y += 3.75;
-        rightLeg.position.x += 0.9;
+        rightLeg.position.y += 2.0;
+        rightLeg.position.x -= 0.5;
+        rightLeg.scale.y = 2;
         farmer.addChild(rightLeg);
         loader.load('models/farmer-lower-leg-right.json',
         function(geometry) {
                var lowerRightLegModel = new THREE.Mesh(geometry, material);
                lowerRightLeg = WorldObject.objectFromMesh(world, lowerRightLegModel);
                rightLeg.addChild(lowerRightLeg);
-               lowerRightLeg.position.y -= 1;
+               lowerRightLeg.position.y -= 0.85;
+               lowerRightLeg.position.z += 0.05;
                lowerRightLeg.position.x += 0.125;
                initPlayerFinal(leftArm, rightArm, leftLeg, rightLeg);
                initGame();
@@ -181,7 +186,9 @@ function initPlayerFinal (leftArm, rightArm, leftLeg, rightLeg) {
      farmer.position.z -= 4;
      farmer.position.y -= 2;
      var arms = new LimbPair(leftArm, rightArm);
+     arms.setMovement(framesPerStep, maxArmAngle, leftArmStartForward);
      var legs = new LimbPair(leftLeg, rightLeg);
+     legs.setMovement(framesPerStep, maxLegAngle, leftLegStartForward);
      var body = new Body(arms, legs);
      player.setBody(body);
 }
@@ -277,6 +284,13 @@ function updatePhysics () {
 
 function updateRenderer () {
      renderer.render(scene, camera);
+     if (player.queryWalking()) {
+          player.walk();
+          playerWasWalking = true;
+     } else if (playerWasWalking) {
+          player.stop();
+          playerWasWalking = false;
+     }
 }
 
  //----------------------------------------------------------------------------------

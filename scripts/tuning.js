@@ -3,13 +3,14 @@
  * @desc: Defines the tuning variables for the game
  */
 
-var playerSpeed = 1;
+var playerSpeed = 0.75;
 var playerStrafeSpeed = 0.5;
 var playerLookSpeed = 0.01;
 var maxLegAngle = Math.PI / 4;
 var maxArmAngle = Math.PI / 6;
 var leftLegStartForward = true;
 var leftArmStartForward = false;
+var framesPerStep = 40;
 
 var godModeEnabled = true;
 
@@ -27,8 +28,8 @@ var textureYRepeat = 5;
 var textureXRepeat = 20;
 
 // Farm grid vars:
-var gridMin = -50;
-var gridMax = 50;
+var gridMin = -200;
+var gridMax = 200;
 var gridStep = 5;
 
 // Tools

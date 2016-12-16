@@ -79,6 +79,9 @@ WorldObject.prototype = {
      get rotation  () {
           return this.mesh.rotation;
      },
+     get scale () {
+          return this.mesh.scale;
+     },
 }
 
 // Static constructor to create an object from an already created mesh

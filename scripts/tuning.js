@@ -12,7 +12,7 @@ var leftLegStartForward = true;
 var leftArmStartForward = false;
 var framesPerStep = 40;
 
-var godModeEnabled = true;
+var godModeEnabled = false;
 
 var cameraY = 10;
 var cameraZ = 20;

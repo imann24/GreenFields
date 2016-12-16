@@ -1,3 +1,8 @@
+/**
+ * @author: Isaiah Mann
+ * @desc: Controls logic for human movement
+ */
+
 function Limb () {}
 
 Limb.prototype.setup = function  (upper, lower) {

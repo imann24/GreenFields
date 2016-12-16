@@ -68,6 +68,8 @@ World.prototype.getCollisionsWithObject = function (object) {
 function WorldObject () {
      this.ownsCollider = false;
      this.id = idKey + (++instanceCount);
+     this.children = [];
+     this.childrenTransforms = {};
 }
 
 WorldObject.prototype = {

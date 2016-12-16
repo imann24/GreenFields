@@ -35,6 +35,10 @@ Player.prototype.setup = function () {
      this.setupMouseLook();
 }
 
+Player.prototype.setBody = function (body) {
+     this.body = body;
+}
+
 Player.prototype.setupInventory = function () {
      this.inventory = [];
      this.equippedTool = null;

@@ -72,8 +72,6 @@ function initCamera () {
 function initPlayer () {
      player = new Player(scene, camera, worldCanvas,
           playerSpeed, playerStrafeSpeed, playerLookSpeed);
-     // Turn of the xRotation of the camera:
-     player.toggleXRotationEnabled();
      var material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
      var loader = new THREE.JSONLoader();
      // Rest of the body loaded throw a series of callbacks (async):
@@ -90,7 +88,7 @@ function initPlayerBody (loader, material) {
         farmer = WorldObject.objectFromMesh(world, farmerModel);
         farmer.addCollider();
         farmer.setId("Player");
-        camera.add(farmerModel);
+        farmerModel.add(camera);
         initLeftArm(loader, material);
     });
 }
@@ -182,6 +180,8 @@ function initRightLeg (loader, material, leftArm, rightArm, leftLeg) {
 
 function initPlayerFinal (leftArm, rightArm, leftLeg, rightLeg) {
      camera.rotation.x -= Math.PI / 4;
+     camera.position.z += 5;
+     camera.position.y += 5;
      farmer.rotation.x += Math.PI / 4;
      farmer.position.z -= 4;
      farmer.position.y -= 2;
@@ -191,6 +191,9 @@ function initPlayerFinal (leftArm, rightArm, leftLeg, rightLeg) {
      legs.setMovement(framesPerStep, maxLegAngle, leftLegStartForward);
      var body = new Body(arms, legs);
      player.setBody(body);
+     player.setupMouseLook(farmer.mesh);
+     // Turn of the xRotation of the camera:
+     player.toggleXRotationEnabled();
 }
 
 function createPlant (position) {

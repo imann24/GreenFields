@@ -32,7 +32,6 @@ Player.prototype = {
 }
 
 Player.prototype.setup = function () {
-     this.setupMouseLook();
      this.isWalking = false;
 }
 
@@ -87,12 +86,12 @@ Player.prototype.getMousePos = function (canvas, evt) {
       };
 }
 
-Player.prototype.setupMouseLook = function () {
-    this.pointerLook = new THREE.PointerLockControls(this.camera);
+Player.prototype.setupMouseLook = function (target) {
+    this.pointerLook = new THREE.PointerLockControls(target);
     this.scene.add(this.pointerLook.getObject());
     this.pointerLook.enabled = true;
     // Accounts for the offset of adding the camera to the controls parent
-    camera.position.y -= 5;
+    target.position.y -= 5;
 }
 
 

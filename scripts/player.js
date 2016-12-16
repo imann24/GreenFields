@@ -33,6 +33,23 @@ Player.prototype = {
 
 Player.prototype.setup = function () {
      this.setupMouseLook();
+     this.isWalking = false;
+}
+
+Player.prototype.setBody = function (body) {
+     this.body = body;
+}
+
+Player.prototype.queryWalking = function () {
+     return this.isWalking;
+}
+
+Player.prototype.walk = function () {
+     this.body.walk();
+}
+
+Player.prototype.stop = function () {
+     this.body.resetLimbs();
 }
 
 Player.prototype.setupInventory = function () {
@@ -89,6 +106,7 @@ Player.prototype.toggleYRotationEnabled = function () {
 
 // Uses KeyboardState.js:
 Player.prototype.move = function () {
+     this.isWalking = false;
      keyboard.update();
      if (keyboard.pressed("left") || keyboard.pressed("A")) {
           this.applyMove("x", -this.strafeSpeed);
@@ -116,6 +134,7 @@ Player.prototype.move = function () {
 Player.prototype.applyMove = function (axis, velocity) {
      // Movement code adapted from: http://stackoverflow.com/questions/16201573/how-to-properly-move-the-camera-in-the-direction-its-facing
      if (axis == "z") {
+          this.isWalking = true;
           camera.position.z += Math.cos(this.facing) * velocity;
           camera.position.x += Math.sin(this.facing) * velocity;
      } else if (axis == "x") {

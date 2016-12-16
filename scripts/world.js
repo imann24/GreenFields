@@ -68,6 +68,8 @@ World.prototype.getCollisionsWithObject = function (object) {
 function WorldObject () {
      this.ownsCollider = false;
      this.id = idKey + (++instanceCount);
+     this.children = [];
+     this.childrenTransforms = {};
 }
 
 WorldObject.prototype = {
@@ -76,6 +78,9 @@ WorldObject.prototype = {
      },
      get rotation  () {
           return this.mesh.rotation;
+     },
+     get scale () {
+          return this.mesh.scale;
      },
 }
 
@@ -387,10 +392,10 @@ function ActiveFarmObject (world, position) {
 
 ActiveFarmObject.prototype = new WorldObject();
 
-ActiveFarmObject.prototype.farmObjectSetup = function (type, scene, position) {
+ActiveFarmObject.prototype.farmObjectSetup = function (type, world, position) {
      this.type = type;
      this.defaultRespondsToValue = false;
-     this.setReferences(scene, position);
+     this.setReferences(world, position);
 }
 
 // Override this method in the subclasses:

@@ -33,6 +33,7 @@ Player.prototype = {
 
 Player.prototype.setup = function () {
      this.isWalking = false;
+     this.setupInventory();
 }
 
 Player.prototype.setBody = function (body) {
@@ -54,7 +55,7 @@ Player.prototype.stop = function () {
 }
 
 Player.prototype.setupInventory = function () {
-     this.inventory = [];
+     this.inventory = new Inventory(this);
      this.equippedTool = null;
 }
 

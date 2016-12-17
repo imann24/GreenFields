@@ -44,6 +44,7 @@ function initWorld() {
      initPlayer();
      initLights();
      initFarm();
+     initUserInterface();
 }
 
 function initTextures () {
@@ -234,8 +235,9 @@ function initFarm () {
 }
 
 function initUserInterface () {
-     userInterface = new UserInterface(uicanvas);
      uiCanvas = document.getElementById("uicanvas");
+     userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"));
+     userInterface.add(new UIElement(userInterface, new Vector2(0, 0), new Vector2(100, 100)));
 }
 
 function tryInitWebGL () {
@@ -264,6 +266,7 @@ function update() {
      updatePhysics();
      updateInput();
      updateRenderer();
+     updateUserInterface();
 }
 
 function updateInput () {
@@ -293,6 +296,9 @@ function updateRenderer () {
      }
 }
 
+function updateUserInterface () {
+     userInterface.draw();
+}
  //----------------------------------------------------------------------------------
 
  // The init() function is called by the onload event when the document has loaded.

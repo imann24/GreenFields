@@ -3,19 +3,61 @@
  * @desc: Manages the user interface of the game
  */
 
-function UserInterface (canvas) {
+function UserInterface (canvas, graphics) {
      this.canvas = canvas;
+     this.graphics = graphics;
+     this.elements = [];
 }
 
-function UIElement () {}
+UserInterface.prototype.add = function (element) {
+     this.elements.push(element);
+}
 
-UIElement.prototype.setup = function (controller) {
+UserInterface.prototype.draw = function () {
+     var e = this.elements;
+     for (var i = 0; i < e.length; i++) {
+          e[i].draw(this.graphics);
+     }
+}
+
+function UIElement (controller, origin, size) {
+     this.setup(controller, origin, size);
+}
+
+UIElement.prototype.setup = function (controller, origin, size) {
      this.controller = controller;
+     this.origin = origin;
+     this.size = size;
 }
 
-function UIPanel () {}
+UIElement.prototype.drawElement = function (graphics) {
+     var o = this.origin;
+     var s = this.size;
+     graphics.fillStyle = "white";
+     graphics.fillRect(o.x, o.y, s.x, s.y);
+}
+
+UIElement.prototype.draw = function (graphics) {
+     this.drawElement(graphics);
+}
+
+function UIPanel () {
+     this.elements = [];
+}
 
 UIPanel.prototype = new UIPanel();
+
+UIPanel.prototype.add = function (element) {
+     this.elements.push(element);
+}
+
+UIPanel.prototype.draw = function (graphics) {
+     this.drawElement(graphics);
+     var e = this.elements;
+     for (var i = 0; i < e.length; i++) {
+          e[i].draw(graphics);
+     }
+}
 
 function InventoryPanel (controller) {
      this.setup(controller);
@@ -23,7 +65,7 @@ function InventoryPanel (controller) {
 
 InventoryPanel.prototype = new UIPanel();
 
-InventoryPanel.prototype.add (item) {
+InventoryPanel.prototype.add = function (item) {
      // TODO: Implement this
 }
 

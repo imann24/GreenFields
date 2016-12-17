@@ -85,7 +85,6 @@ function initPlayerBody (loader, material) {
         torsoModel.position.y = -2.5;
         torsoModel.rotation.y = Math.PI;
         var torso = WorldObject.objectFromMesh(world, torsoModel);
-        torso.addCollider();
         torso.setId("Player");
         torsoModel.add(camera);
         initLeftArm(loader, material, torso);
@@ -179,14 +178,13 @@ function initRightLeg (loader, material, torso, leftArm, rightArm, leftLeg) {
 
 function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      // camera.rotation.x -= Math.PI / 4;
-     camera.position.z -= 10;
-     camera.position.y += 10;
+     camera.position.z -= 7.5;
+     camera.position.y += 6;
      torso.rotation.x += Math.PI / 4;
      torso.position.z -= 4;
-     torso.position.y += 2;
      // camera.rotation.z += Math.PI;
      camera.rotation.y += Math.PI;
-     camera.rotation.x += Math.PI / 4;
+     camera.rotation.x += Math.PI / 8;
      var arms = new LimbPair(leftArm, rightArm);
      arms.setMovement(framesPerStep, maxArmAngle, leftArmStartForward);
      var legs = new LimbPair(leftLeg, rightLeg);
@@ -194,8 +192,8 @@ function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      var body = new Body(torso, arms, legs);
      player.setBody(body);
      player.setupMouseLook(torso.mesh);
-     // Turn of the xRotation of the camera:
-     player.toggleXRotationEnabled();
+     body.position.y -= 0.25;
+     torso.addCollider();
 }
 
 function createPlant (position) {

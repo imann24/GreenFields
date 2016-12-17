@@ -5,7 +5,7 @@
 
 var playerSpeed = 0.75;
 var playerStrafeSpeed = 0.5;
-var playerLookSpeed = 0.01;
+var playerLookSpeed = 0.125;
 var maxLegAngle = Math.PI / 4;
 var maxArmAngle = Math.PI / 6;
 var leftLegStartForward = true;

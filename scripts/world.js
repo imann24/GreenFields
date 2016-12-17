@@ -239,6 +239,7 @@ WorldObject.prototype.addCollider = function () {
 
 WorldObject.prototype.updateCollider = function () {
      this.collider = new THREE.Box3().setFromObject(this.mesh);
+     this.collider.min.y -= 10;
 }
 
 WorldObject.prototype.isCollidingWith = function (worldObject) {

@@ -41,6 +41,19 @@ UIElement.prototype.draw = function (graphics) {
      this.drawElement(graphics);
 }
 
+function UIImage (controller, origin, size, img) {
+     this.setup(controller, origin, size);
+     this.img = img;
+}
+
+UIImage.prototype = new UIElement();
+
+UIImage.prototype.drawElement = function (graphics) {
+     var o = this.origin;
+     var s = this.size;
+     graphics.drawImage(this.img, o.x, o.y, s.x, s.y);
+}
+
 function UIPanel () {
      this.elements = [];
 }
@@ -59,15 +72,16 @@ UIPanel.prototype.draw = function (graphics) {
      }
 }
 
-function InventoryPanel (controller, origin, size) {
+function InventoryPanel (controller, origin, size, imageLookup) {
      this.setup(controller, origin, size);
+     this.imageLookup = imageLookup;
+     for (var i = 0; i < toolKeys.length; i++) {
+          this.add(new UIImage(controller, origin.add(new Vector2(i * 225, 0)),
+           new Vector2(100, 100), imageLookup[toolKeys[i]]));
+     }
 }
 
 InventoryPanel.prototype = new UIPanel();
-
-InventoryPanel.prototype.add = function (item) {
-     // TODO: Implement this
-}
 
 function InventorySlot () {
 

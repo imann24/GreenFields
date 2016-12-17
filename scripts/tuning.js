@@ -37,7 +37,7 @@ var hoeKey = "Hoe";
 var seedsKey = "Seeds";
 var wateringCanKey = "Watering Can";
 var basketKey = "Basket";
-
+var toolKeys = [hoeKey, seedsKey, wateringCanKey, basketKey];
 // Farm Items
 var plantKey = "Plant";
 var farmTileKey = "Farm Tile";

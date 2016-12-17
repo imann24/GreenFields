@@ -32,12 +32,14 @@ var tilledDirtTexture;
 var plantTexture;
 var playerWasWalking = false;
 
+var images = {};
+
 // Create the scene. This function is called once, as soon as the page loads.
 // The renderer has already been created before this function is called.
 function initWorld() {
      // These functions should be called in the following order in order to guarantee dependency initialization
-     initUserInterface();
      initTextures();
+     initUserInterface();
      initScene();
      world = new World(scene);
      initInput();
@@ -48,6 +50,9 @@ function initWorld() {
 }
 
 function initTextures () {
+     for (var i = 0; i < toolKeys.length; i++) {
+          images[toolKeys[i]] = document.getElementById(toolKeys[i]);
+     }
      roughDirtTexture = THREE.ImageUtils.loadTexture("img/dirt.jpg");
      tilledDirtTexture = THREE.ImageUtils.loadTexture("img/tilled-dirt.jpg");
      plantTexture = THREE.ImageUtils.loadTexture("img/plant.jpg");
@@ -237,7 +242,8 @@ function initFarm () {
 function initUserInterface () {
      uiCanvas = document.getElementById("uicanvas");
      userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"));
-     userInterface.add(new InventoryPanel(userInterface, new Vector2(0, 500), new Vector2(800, 100)));
+     console.log(images);
+     userInterface.add(new InventoryPanel(userInterface, new Vector2(0, 500), new Vector2(800, 100), images));
 }
 
 function tryInitWebGL () {

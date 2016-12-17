@@ -241,7 +241,7 @@ function initFarm () {
 
 function initUserInterface () {
      uiCanvas = document.getElementById("uicanvas");
-     userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"));
+     userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"), "black");
      userInterface.add(new InventoryPanel(userInterface, new Vector2(0, 500), new Vector2(800, 100), images));
 }
 

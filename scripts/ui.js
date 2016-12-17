@@ -3,9 +3,10 @@
  * @desc: Manages the user interface of the game
  */
 
-function UserInterface (canvas, graphics) {
+function UserInterface (canvas, graphics, color) {
      this.canvas = canvas;
      this.graphics = graphics;
+     this.color = color;
      this.elements = [];
 }
 
@@ -16,7 +17,7 @@ UserInterface.prototype.add = function (element) {
 UserInterface.prototype.draw = function () {
      var e = this.elements;
      for (var i = 0; i < e.length; i++) {
-          e[i].draw(this.graphics);
+          e[i].draw(this.graphics, this.color);
      }
 }
 
@@ -30,19 +31,19 @@ UIElement.prototype.setup = function (controller, origin, size) {
      this.size = size;
 }
 
-UIElement.prototype.drawElement = function (graphics) {
+UIElement.prototype.drawElement = function (graphics, color) {
      var o = this.origin;
      var s = this.size;
-     graphics.fillStyle = "black";
+     graphics.fillStyle = color;
      graphics.fillRect(o.x, o.y, s.x, s.y);
 }
 
-UIElement.prototype.draw = function (graphics) {
-     this.drawElement(graphics);
-     this.drawExtras(graphics);
+UIElement.prototype.draw = function (graphics, color) {
+     this.drawElement(graphics, color);
+     this.drawExtras(graphics, color);
 }
 
-UIElement.prototype.drawExtras = function (graphics) {
+UIElement.prototype.drawExtras = function (graphics, color) {
      // Override in Subclass
 }
 
@@ -54,11 +55,11 @@ function UIImage (controller, origin, size, img, drawBackground) {
 
 UIImage.prototype = new UIElement();
 
-UIImage.prototype.drawElement = function (graphics) {
+UIImage.prototype.drawElement = function (graphics, color) {
      var o = this.origin;
      var s = this.size;
      if (this.drawBackground) {
-          graphics.fillStyle = "grey";
+          graphics.fillStyle = color;
           graphics.fillRect(o.x, o.y, s.x, s.y);
      }
      graphics.drawImage(this.img, o.x, o.y, s.x, s.y);
@@ -66,6 +67,9 @@ UIImage.prototype.drawElement = function (graphics) {
 
 function UIPanel () {
      this.elements = [];
+     this.selectedIndex = NULL_INDEX;
+     this.selectedColor = "lightgreen";
+     this.unselectedColor = "gray";
 }
 
 UIPanel.prototype = new UIElement();
@@ -74,13 +78,25 @@ UIPanel.prototype.add = function (element) {
      this.elements.push(element);
 }
 
-UIPanel.prototype.draw = function (graphics) {
-     this.drawElement(graphics);
+UIPanel.prototype.draw = function (graphics, color) {
+     this.drawElement(graphics, color);
      var e = this.elements;
      for (var i = 0; i < e.length; i++) {
-          e[i].draw(graphics);
+          if (this.selectedIndex == i) {
+               e[i].draw(graphics, this.selectedColor);
+          } else {
+               e[i].draw(graphics, this.unselectedColor);
+          }
      }
-     this.drawExtras(graphics);
+     this.drawExtras(graphics, color);
+}
+
+UIPanel.prototype.select = function (selectIndex) {
+     tihs.selectIndex = selectedIndex;
+}
+
+UIPanel.prototype.deselect = function () {
+     this.selectedIndex = NULL_INDEX;
 }
 
 function InventoryPanel (controller, origin, size, imageLookup) {
@@ -95,10 +111,10 @@ function InventoryPanel (controller, origin, size, imageLookup) {
 
 InventoryPanel.prototype = new UIPanel();
 
-InventoryPanel.prototype.drawExtras = function (graphics) {
+InventoryPanel.prototype.drawExtras = function (graphics, color) {
      graphics.fillStyle = "white";
      graphics.font = "30px Arial";
      for (var i = 0; i < toolKeys.length; i++) {
-          graphics.fillText(i + 1, this.origin.x + i * 234 + 10, this.origin.y + 30);
+          graphics.fillText(i+ 1, this.origin.x + i * 234 + 10, this.origin.y + 30);
      }
 }

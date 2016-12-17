@@ -82,9 +82,23 @@ LimbPair.prototype.retractMovement = function (progress) {
      this.backLimb.rotation.x = Math.lerp(-this.maxAngle, 0, progress);
 }
 
-function Body (arms, legs) {
+function Body (torso, arms, legs) {
+     this.torso = torso;
      this.arms = arms;
      this.legs = legs;
+}
+
+Body.prototype = {
+     // The torso is the parent object of the rest of the body
+     get position () {
+          return this.torso.position;
+     },
+     get rotation () {
+          return this.torso.rotation;
+     },
+     get scale () {
+          return this.torso.scale;
+     },
 }
 
 Body.prototype.walk = function () {
@@ -95,4 +109,28 @@ Body.prototype.walk = function () {
 Body.prototype.resetLimbs = function () {
      this.arms.resetMovement();
      this.legs.resetMovement();
+}
+
+Body.prototype.getCollider = function () {
+     return this.torso.getCollider();
+}
+
+Body.prototype.updateCollider = function () {
+     this.torso.updateCollider();
+}
+
+Body.prototype.hasCollider = function () {
+     return this.torso.hasCollider();
+}
+
+Body.prototype.isCollidingWith = function (otherObject) {
+     return this.torso.isCollidingWith(otherObject);
+}
+
+Body.prototype.getId = function () {
+     return this.torso.getId();
+}
+
+Body.prototype.setId = function (id) {
+     this.torso.setId(id);
 }

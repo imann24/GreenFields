@@ -1,16 +1,15 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/, Project-specific modifications by Isaiah Mann
  */
 
-THREE.PointerLockControls = function ( camera ) {
-
+THREE.PointerLockControls = function ( target ) {
 	var scope = this;
 	this.xRotationEnabled = true;
 	this.yRotationEnabled = true;
-	camera.rotation.set( 0, 0, 0 );
+	target.rotation.set( 0, 0, 0 );
 
 	var pitchObject = new THREE.Object3D();
-	pitchObject.add( camera );
+	pitchObject.add( target );
 
 	var yawObject = new THREE.Object3D();
 	yawObject.position.y = 10;
@@ -19,7 +18,7 @@ THREE.PointerLockControls = function ( camera ) {
 	var PI_2 = Math.PI / 2;
 
 	var onMouseMove = function ( event ) {
-
+		return;
 		if ( scope.enabled === false ) return;
 
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
@@ -59,8 +58,12 @@ THREE.PointerLockControls = function ( camera ) {
 		this.yRotationEnabled = !this.yRotationEnabled;
 	};
 
+	this.updateTarget = function (target) {
+		this.target = target;
+	}
+
 	this.getDirection = function() {
-		// assumes the camera itself is not rotated
+		// assumes the target itself is not rotated
 		var direction = new THREE.Vector3( 0, 0, - 1 );
 		var rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
 		return function( v ) {

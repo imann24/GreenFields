@@ -24,20 +24,21 @@ function Player (scene, camera, canvas, speed, strafeSpeed, lookSpeed) {
 Player.prototype = {
      // Getter var to make accessing the look rotation more concise:
      get facing () {
-          return this.camera.rotation.y;
+          return this.body.rotation.y + Math.PI;
      },
      get position () {
-          return ths.camera.position;
+          return ths.body.position;
      },
 }
 
 Player.prototype.setup = function () {
-     this.setupMouseLook();
      this.isWalking = false;
 }
 
 Player.prototype.setBody = function (body) {
      this.body = body;
+     this.body.setId("Player");
+     this.rotate(0);
 }
 
 Player.prototype.queryWalking = function () {
@@ -79,29 +80,54 @@ Player.prototype.useTool = function (target) {
      }
 }
 
-Player.prototype.getMousePos = function (canvas, evt) {
-      var rect = canvas.getBoundingClientRect();
-      return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-      };
-}
-
-Player.prototype.setupMouseLook = function () {
-    this.pointerLook = new THREE.PointerLockControls(this.camera);
-    this.scene.add(this.pointerLook.getObject());
-    this.pointerLook.enabled = true;
+Player.prototype.setupMouseLook = function (target) {
+    // this.pointerLook = new THREE.PointerLockControls(target);
+    // this.scene.add(this.pointerLook.getObject());
+    // this.pointerLook.enabled = true;
     // Accounts for the offset of adding the camera to the controls parent
-    camera.position.y -= 5;
+    // target.position.y -= 5;
+    this.leftBound = this.canvas.width / 4;
+    this.rightBound = 3 * this.canvas.width / 4;
+    this.turningLeft = false;
+    this.turningRight = false;
+    var player = this;
+    this.canvas.addEventListener('mousemove', function(event) {
+      var mousePosition = Input.getMousePosition(player.canvas, event);
+      player.turningLeft = false;
+      player.turningRight = false;
+      if (mousePosition.x < player.leftBound) {
+           player.turningLeft = true;
+      } else if (mousePosition.x > player.rightBound) {
+           player.turningRight = true;
+      }
+    }, false);
 }
 
-
-Player.prototype.toggleXRotationEnabled = function () {
-	this.pointerLook.toggleXRotationEnabled();
+Player.prototype.rotate = function (deltaYRotation) {
+     this.body.rotation.y += deltaYRotation;
+     // Have to zero out the other vectors to ensure the player stays upright
+     this.body.rotation.x = 0;
+     this.body.rotation.z = 0;
 }
 
-Player.prototype.toggleYRotationEnabled = function () {
-	this.pointerLook.toggleYRotationEnabled();
+Player.prototype.updateCollider = function () {
+     this.body.updateCollider();
+}
+
+Player.prototype.hasCollider = function () {
+     return this.body.hasCollider();
+}
+
+Player.prototype.getCollider = function () {
+     return this.body.getCollider();
+}
+
+Player.prototype.isCollidingWith = function (otherObject) {
+     return this.body.isCollidingWith(otherObject);
+}
+
+Player.prototype.getId = function () {
+     return this.body.getId();
 }
 
 // Uses KeyboardState.js:
@@ -129,33 +155,38 @@ Player.prototype.move = function () {
                this.applyMove("y", -this.speed);
           }
      }
+     if (this.turningLeft) {
+          player.rotate(this.lookSpeed);
+     } else if (this.turningRight) {
+          player.rotate(-this.lookSpeed);
+     }
 }
 
 Player.prototype.applyMove = function (axis, velocity) {
      // Movement code adapted from: http://stackoverflow.com/questions/16201573/how-to-properly-move-the-camera-in-the-direction-its-facing
      if (axis == "z") {
           this.isWalking = true;
-          camera.position.z += Math.cos(this.facing) * velocity;
-          camera.position.x += Math.sin(this.facing) * velocity;
+          this.body.position.z += Math.cos(this.facing) * velocity;
+          this.body.position.x += Math.sin(this.facing) * velocity;
      } else if (axis == "x") {
-          camera.position.x -= Math.sin(this.facing - Math.PI / 2) * velocity;
-          camera.position.z -= Math.cos(this.facing - Math.PI / 2) * velocity;
+          this.body.position.x -= Math.sin(this.facing - Math.PI / 2) * velocity;
+          this.body.position.z -= Math.cos(this.facing - Math.PI / 2) * velocity;
      } else if (axis == "y") {
-          camera.position.y += velocity;
+          this.body.position.y += velocity;
      }
 }
 
-Player.prototype.applyRotation = function (axisKey) {
+Player.prototype.applyRotation = function (axisKey, delta) {
      var vector = new THREE.Vector3(1, 0, 0);
      var angle;
      var axis;
      if (axisKey = "x") {
-          axis = new THREE.Vector3(1, 0, 0);
+          axis = new THREE.Vector3(delta, 0, 0);
           angle = this.xLook;
      } else if (axisKey == "y") {
-          axis = new THREE.Vector3(0, 1, 0);
+          axis = new THREE.Vector3(0, delta, 0);
           angle = this.yLook;
      }
      vector.applyAxisAngle(axis, angle);
-     this.camera.rotation.setFromVector3(vector);
+     this.body.rotation.setFromVector3(vector);
 }

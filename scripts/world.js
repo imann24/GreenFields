@@ -55,7 +55,7 @@ World.prototype.getCollisionsWithObject = function (object) {
      if (object.hasCollider()) {
           var allColliders = this.getObjectsWithColliders();
           for (var i = 0; i < allColliders.length; i++) {
-               if (object === allColliders[i]) {
+               if (object.getId() == allColliders[i].getId()) {
                     continue;
                } else if (object.isCollidingWith(allColliders[i])) {
                     collisions.push(allColliders[i]);
@@ -228,6 +228,10 @@ WorldObject.prototype.hasCollider = function () {
      return this.ownsCollider;
 }
 
+WorldObject.prototype.getCollider = function () {
+     return this.collider;
+}
+
 WorldObject.prototype.addCollider = function () {
      this.ownsCollider = true;
      this.updateCollider();
@@ -235,6 +239,7 @@ WorldObject.prototype.addCollider = function () {
 
 WorldObject.prototype.updateCollider = function () {
      this.collider = new THREE.Box3().setFromObject(this.mesh);
+     this.collider.min.y -= 10;
 }
 
 WorldObject.prototype.isCollidingWith = function (worldObject) {

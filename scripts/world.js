@@ -228,6 +228,10 @@ WorldObject.prototype.hasCollider = function () {
      return this.ownsCollider;
 }
 
+WorldObject.prototype.getCollider = function () {
+     return this.collider;
+}
+
 WorldObject.prototype.addCollider = function () {
      this.ownsCollider = true;
      this.updateCollider();

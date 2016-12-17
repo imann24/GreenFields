@@ -94,13 +94,28 @@ Player.prototype.setupMouseLook = function (target) {
     target.position.y -= 5;
 }
 
-
 Player.prototype.toggleXRotationEnabled = function () {
 	this.pointerLook.toggleXRotationEnabled();
 }
 
 Player.prototype.toggleYRotationEnabled = function () {
 	this.pointerLook.toggleYRotationEnabled();
+}
+
+Player.prototype.updateCollider = function () {
+     this.body.updateCollider();
+}
+
+Player.prototype.hasCollider = function () {
+     return this.body.hasCollider();
+}
+
+Player.prototype.getCollider = function () {
+     return this.body.getCollider();
+}
+
+Player.prototype.isCollidingWith = function (otherObject) {
+     return this.body.isCollidingWith(otherObject);
 }
 
 // Uses KeyboardState.js:
@@ -134,13 +149,13 @@ Player.prototype.applyMove = function (axis, velocity) {
      // Movement code adapted from: http://stackoverflow.com/questions/16201573/how-to-properly-move-the-camera-in-the-direction-its-facing
      if (axis == "z") {
           this.isWalking = true;
-          camera.position.z += Math.cos(this.facing) * velocity;
-          camera.position.x += Math.sin(this.facing) * velocity;
+          this.body.position.z += Math.cos(this.facing) * velocity;
+          this.body.position.x += Math.sin(this.facing) * velocity;
      } else if (axis == "x") {
-          camera.position.x -= Math.sin(this.facing - Math.PI / 2) * velocity;
-          camera.position.z -= Math.cos(this.facing - Math.PI / 2) * velocity;
+          this.body.position.x -= Math.sin(this.facing - Math.PI / 2) * velocity;
+          this.body.position.z -= Math.cos(this.facing - Math.PI / 2) * velocity;
      } else if (axis == "y") {
-          camera.position.y += velocity;
+          this.body.position.y += velocity;
      }
 }
 
@@ -156,5 +171,5 @@ Player.prototype.applyRotation = function (axisKey) {
           angle = this.yLook;
      }
      vector.applyAxisAngle(axis, angle);
-     this.camera.rotation.setFromVector3(vector);
+     this.body.rotation.setFromVector3(vector);
 }

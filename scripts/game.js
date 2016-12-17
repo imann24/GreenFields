@@ -14,7 +14,6 @@ var userInterface;
 
 // World Objects
 var world;
-var farmer;
 var playerIsLoaded = false;
 
 // Arms
@@ -81,26 +80,26 @@ function initPlayer () {
 function initPlayerBody (loader, material) {
      loader.load('models/farmer-body.json',
      function(geometry) {
-        var farmerModel = new THREE.Mesh(geometry, material);
-        farmerModel.position.z = -5;
-        farmerModel.position.y = -2.5;
-        farmerModel.rotation.y = Math.PI;
-        farmer = WorldObject.objectFromMesh(world, farmerModel);
-        farmer.addCollider();
-        farmer.setId("Player");
-        farmerModel.add(camera);
-        initLeftArm(loader, material);
+        var torsoModel = new THREE.Mesh(geometry, material);
+        torsoModel.position.z = -5;
+        torsoModel.position.y = -2.5;
+        torsoModel.rotation.y = Math.PI;
+        var torso = WorldObject.objectFromMesh(world, torsoModel);
+        torso.addCollider();
+        torso.setId("Player");
+        torsoModel.add(camera);
+        initLeftArm(loader, material, torso);
     });
 }
 
-function initLeftArm (loader, material) {
+function initLeftArm (loader, material, torso) {
      loader.load('models/farmer-upper-arm-left.json',
      function(geometry) {
         var leftArmModel = new THREE.Mesh(geometry, material);
         var leftArm = WorldObject.objectFromMesh(world, leftArmModel);
         leftArm.position.y += 3.75;
         leftArm.position.x += 0.9;
-        farmer.addChild(leftArm);
+        torso.addChild(leftArm);
         loader.load('models/farmer-lower-arm-left.json',
         function(geometry) {
                var lowerLeftArmModel = new THREE.Mesh(geometry, material);
@@ -108,19 +107,19 @@ function initLeftArm (loader, material) {
                leftArm.addChild(lowerLeftArm);
                lowerLeftArm.position.y -= 1;
                lowerLeftArm.position.x += 0.125;
-               initRightArm(loader, material, leftArm);
+               initRightArm(loader, material, torso, leftArm);
           });
      });
 }
 
-function initRightArm (loader, material, leftArm) {
+function initRightArm (loader, material, torso, leftArm) {
      loader.load('models/farmer-upper-arm-right.json',
      function(geometry) {
         rightArmModel = new THREE.Mesh(geometry, material);
         rightArm = WorldObject.objectFromMesh(world, rightArmModel);
         rightArm.position.y += 3.75;
         rightArm.position.x -= 0.9;
-        farmer.addChild(rightArm);
+        torso.addChild(rightArm);
         loader.load('models/farmer-lower-arm-right.json',
         function(geometry) {
                var lowerRightArmModel = new THREE.Mesh(geometry, material);
@@ -128,12 +127,12 @@ function initRightArm (loader, material, leftArm) {
                rightArm.addChild(lowerRightArm);
                lowerRightArm.position.y -= 1;
                lowerRightArm.position.x -= 0.125;
-               initLeftLeg(loader, material, leftArm, rightArm);
+               initLeftLeg(loader, material, torso, leftArm, rightArm);
           });
      });
 }
 
-function initLeftLeg (loader, material, leftArm, rightArm) {
+function initLeftLeg (loader, material, torso, leftArm, rightArm) {
      loader.load('models/farmer-upper-leg-left.json',
      function(geometry) {
         leftLegModel = new THREE.Mesh(geometry, material);
@@ -141,7 +140,7 @@ function initLeftLeg (loader, material, leftArm, rightArm) {
         leftLeg.position.y += 2.0;
         leftLeg.position.x += 0.5;
         leftLeg.scale.y = 2;
-        farmer.addChild(leftLeg);
+        torso.addChild(leftLeg);
         loader.load('models/farmer-lower-leg-left.json',
         function(geometry) {
                var lowerLeftLegModel = new THREE.Mesh(geometry, material);
@@ -150,12 +149,12 @@ function initLeftLeg (loader, material, leftArm, rightArm) {
                lowerLeftLeg.position.y -= 0.85;
                lowerLeftLeg.position.z += 0.05;
                lowerLeftLeg.position.x -= 0.1;
-               initRightLeg(loader, material, leftArm, rightArm, leftLeg);
+               initRightLeg(loader, material, torso, leftArm, rightArm, leftLeg);
           });
      });
 }
 
-function initRightLeg (loader, material, leftArm, rightArm, leftLeg) {
+function initRightLeg (loader, material, torso, leftArm, rightArm, leftLeg) {
      loader.load('models/farmer-upper-leg-right.json',
      function(geometry) {
         rightLegModel = new THREE.Mesh(geometry, material);
@@ -163,7 +162,7 @@ function initRightLeg (loader, material, leftArm, rightArm, leftLeg) {
         rightLeg.position.y += 2.0;
         rightLeg.position.x -= 0.5;
         rightLeg.scale.y = 2;
-        farmer.addChild(rightLeg);
+        torso.addChild(rightLeg);
         loader.load('models/farmer-lower-leg-right.json',
         function(geometry) {
                var lowerRightLegModel = new THREE.Mesh(geometry, material);
@@ -172,26 +171,26 @@ function initRightLeg (loader, material, leftArm, rightArm, leftLeg) {
                lowerRightLeg.position.y -= 0.85;
                lowerRightLeg.position.z += 0.05;
                lowerRightLeg.position.x += 0.125;
-               initPlayerFinal(leftArm, rightArm, leftLeg, rightLeg);
+               initPlayerFinal(torso, leftArm, rightArm, leftLeg, rightLeg);
                initGame();
           });
      });
 }
 
-function initPlayerFinal (leftArm, rightArm, leftLeg, rightLeg) {
+function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      camera.rotation.x -= Math.PI / 4;
      camera.position.z += 5;
      camera.position.y += 5;
-     farmer.rotation.x += Math.PI / 4;
-     farmer.position.z -= 4;
-     farmer.position.y -= 2;
+     torso.rotation.x += Math.PI / 4;
+     torso.position.z -= 4;
+     torso.position.y -= 2;
      var arms = new LimbPair(leftArm, rightArm);
      arms.setMovement(framesPerStep, maxArmAngle, leftArmStartForward);
      var legs = new LimbPair(leftLeg, rightLeg);
      legs.setMovement(framesPerStep, maxLegAngle, leftLegStartForward);
-     var body = new Body(arms, legs);
+     var body = new Body(torso, arms, legs);
      player.setBody(body);
-     player.setupMouseLook(farmer.mesh);
+     player.setupMouseLook(torso.mesh);
      // Turn of the xRotation of the camera:
      player.toggleXRotationEnabled();
 }
@@ -276,13 +275,10 @@ function updateInput () {
 }
 
 function updatePhysics () {
-     // Farmer needs a few extra frames to load (async)
-     if (farmer) {
-          farmer.updateCollider();
-          var collisionsWithPlayer = world.getCollisionsWithObject(farmer);
-          // Just pick the first collision in the list:
-          currentCollision = collisionsWithPlayer[0];
-     }
+     player.updateCollider();
+     var collisionsWithPlayer = world.getCollisionsWithObject(player);
+     // Just pick the first collision in the list:
+     currentCollision = collisionsWithPlayer[0];
 }
 
 function updateRenderer () {

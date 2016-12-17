@@ -37,6 +37,7 @@ Player.prototype.setup = function () {
 
 Player.prototype.setBody = function (body) {
      this.body = body;
+     this.body.setId("Player");
 }
 
 Player.prototype.queryWalking = function () {
@@ -116,6 +117,10 @@ Player.prototype.getCollider = function () {
 
 Player.prototype.isCollidingWith = function (otherObject) {
      return this.body.isCollidingWith(otherObject);
+}
+
+Player.prototype.getId = function () {
+     return this.body.getId();
 }
 
 // Uses KeyboardState.js:

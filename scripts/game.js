@@ -178,12 +178,15 @@ function initRightLeg (loader, material, torso, leftArm, rightArm, leftLeg) {
 }
 
 function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
-     camera.rotation.x -= Math.PI / 4;
-     camera.position.z += 5;
-     camera.position.y += 5;
+     // camera.rotation.x -= Math.PI / 4;
+     camera.position.z -= 10;
+     camera.position.y += 10;
      torso.rotation.x += Math.PI / 4;
      torso.position.z -= 4;
-     torso.position.y -= 2;
+     torso.position.y += 2;
+     // camera.rotation.z += Math.PI;
+     camera.rotation.y += Math.PI;
+     camera.rotation.x += Math.PI / 4;
      var arms = new LimbPair(leftArm, rightArm);
      arms.setMovement(framesPerStep, maxArmAngle, leftArmStartForward);
      var legs = new LimbPair(leftLeg, rightLeg);

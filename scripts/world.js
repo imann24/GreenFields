@@ -55,7 +55,7 @@ World.prototype.getCollisionsWithObject = function (object) {
      if (object.hasCollider()) {
           var allColliders = this.getObjectsWithColliders();
           for (var i = 0; i < allColliders.length; i++) {
-               if (object === allColliders[i]) {
+               if (object.getId() == allColliders[i].getId()) {
                     continue;
                } else if (object.isCollidingWith(allColliders[i])) {
                     collisions.push(allColliders[i]);

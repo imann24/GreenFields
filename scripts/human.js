@@ -91,13 +91,13 @@ function Body (torso, arms, legs) {
 Body.prototype = {
      // The torso is the parent object of the rest of the body
      get position () {
-          return torso.position;
+          return this.torso.position;
      },
      get rotation () {
-          return torso.rotation;
+          return this.torso.rotation;
      },
      get scale () {
-          return torso.scale;
+          return this.torso.scale;
      },
 }
 
@@ -125,4 +125,12 @@ Body.prototype.hasCollider = function () {
 
 Body.prototype.isCollidingWith = function (otherObject) {
      return this.torso.isCollidingWith(otherObject);
+}
+
+Body.prototype.getId = function () {
+     return this.torso.getId();
+}
+
+Body.prototype.setId = function (id) {
+     this.torso.setId(id);
 }

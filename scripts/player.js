@@ -4,10 +4,11 @@
  * @requires: THREE.js, KeyboardState.js, PointerLockControls.js
  */
 
-function Player (scene, camera, canvas, speed, strafeSpeed, lookSpeed) {
+function Player (scene, camera, glCanvas, uiCanvas, speed, strafeSpeed, lookSpeed) {
      this.scene = scene;
      this.camera = camera;
-     this.canvas = canvas;
+     this.glCanvas = glCanvas;
+     this.uiCanvas = uiCanvas;
      this.speed = speed;
      // For sideways movement:
      this.strafeSpeed = strafeSpeed;
@@ -87,13 +88,13 @@ Player.prototype.setupMouseLook = function (target) {
     // this.pointerLook.enabled = true;
     // Accounts for the offset of adding the camera to the controls parent
     // target.position.y -= 5;
-    this.leftBound = this.canvas.width / 4;
-    this.rightBound = 3 * this.canvas.width / 4;
+    this.leftBound = this.uiCanvas.width / 4;
+    this.rightBound = 3 * this.uiCanvas.width / 4;
     this.turningLeft = false;
     this.turningRight = false;
     var player = this;
-    this.canvas.addEventListener('mousemove', function(event) {
-      var mousePosition = Input.getMousePosition(player.canvas, event);
+    this.uiCanvas.addEventListener('mousemove', function(event) {
+      var mousePosition = Input.getMousePosition(player.uiCanvas, event);
       player.turningLeft = false;
       player.turningRight = false;
       if (mousePosition.x < player.leftBound) {

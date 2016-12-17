@@ -6,8 +6,8 @@
 #canvas-holder {
      text-align: center;
 }
+
 #uicanvas {
      z-index: 1;
-     float-left;
-     margin-left: -800px;
+     margin-left: -804px;
 }

@@ -36,6 +36,7 @@ var playerWasWalking = false;
 // The renderer has already been created before this function is called.
 function initWorld() {
      // These functions should be called in the following order in order to guarantee dependency initialization
+     initUserInterface();
      initTextures();
      initScene();
      world = new World(scene);
@@ -44,7 +45,6 @@ function initWorld() {
      initPlayer();
      initLights();
      initFarm();
-     initUserInterface();
 }
 
 function initTextures () {
@@ -70,7 +70,7 @@ function initCamera () {
 }
 
 function initPlayer () {
-     player = new Player(scene, camera, worldCanvas,
+     player = new Player(scene, camera, worldCanvas, uiCanvas,
           playerSpeed, playerStrafeSpeed, playerLookSpeed);
      var material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
      var loader = new THREE.JSONLoader();
@@ -180,7 +180,7 @@ function initRightLeg (loader, material, torso, leftArm, rightArm, leftLeg) {
 function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      // camera.rotation.x -= Math.PI / 4;
      camera.position.z -= 7.5;
-     camera.position.y += 6;
+     camera.position.y += 4;
      torso.rotation.x += Math.PI / 4;
      torso.position.z -= 4;
      // camera.rotation.z += Math.PI;
@@ -237,7 +237,7 @@ function initFarm () {
 function initUserInterface () {
      uiCanvas = document.getElementById("uicanvas");
      userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"));
-     userInterface.add(new UIElement(userInterface, new Vector2(0, 0), new Vector2(100, 100)));
+     userInterface.add(new InventoryPanel(userInterface, new Vector2(0, 500), new Vector2(800, 100)));
 }
 
 function tryInitWebGL () {
@@ -306,7 +306,6 @@ function init() {
      if (tryInitWebGL()) {
           // create world and render scene
           initWorld();
-          initUserInterface();
           // Must be called once from init to begin render loop:
      }
 }

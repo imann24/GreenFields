@@ -33,7 +33,7 @@ UIElement.prototype.setup = function (controller, origin, size) {
 UIElement.prototype.drawElement = function (graphics) {
      var o = this.origin;
      var s = this.size;
-     graphics.fillStyle = "white";
+     graphics.fillStyle = "black";
      graphics.fillRect(o.x, o.y, s.x, s.y);
 }
 
@@ -45,7 +45,7 @@ function UIPanel () {
      this.elements = [];
 }
 
-UIPanel.prototype = new UIPanel();
+UIPanel.prototype = new UIElement();
 
 UIPanel.prototype.add = function (element) {
      this.elements.push(element);
@@ -59,8 +59,8 @@ UIPanel.prototype.draw = function (graphics) {
      }
 }
 
-function InventoryPanel (controller) {
-     this.setup(controller);
+function InventoryPanel (controller, origin, size) {
+     this.setup(controller, origin, size);
 }
 
 InventoryPanel.prototype = new UIPanel();

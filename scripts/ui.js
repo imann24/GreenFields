@@ -91,8 +91,8 @@ UIPanel.prototype.draw = function (graphics, color) {
      this.drawExtras(graphics, color);
 }
 
-UIPanel.prototype.select = function (selectIndex) {
-     tihs.selectIndex = selectedIndex;
+UIPanel.prototype.select = function (selectedIndex) {
+     this.selectedIndex = selectedIndex;
 }
 
 UIPanel.prototype.deselect = function () {

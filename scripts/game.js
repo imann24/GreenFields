@@ -11,6 +11,7 @@ var gridPositions;
 
 // UI
 var userInterface;
+var inventoryPanel;
 
 // World Objects
 var world;
@@ -75,8 +76,9 @@ function initCamera () {
 }
 
 function initPlayer () {
+     var inventory = new Inventory(this, inventoryPanel);
      player = new Player(scene, camera, worldCanvas, uiCanvas,
-          playerSpeed, playerStrafeSpeed, playerLookSpeed);
+          playerSpeed, playerStrafeSpeed, playerLookSpeed, inventory);
      var material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
      var loader = new THREE.JSONLoader();
      // Rest of the body loaded throw a series of callbacks (async):
@@ -242,7 +244,8 @@ function initFarm () {
 function initUserInterface () {
      uiCanvas = document.getElementById("uicanvas");
      userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"), "black");
-     userInterface.add(new InventoryPanel(userInterface, new Vector2(0, 500), new Vector2(800, 100), images));
+     inventoryPanel = new InventoryPanel(userInterface, new Vector2(0, 500), new Vector2(800, 100), images);
+     userInterface.add(inventoryPanel);
 }
 
 function tryInitWebGL () {
@@ -280,6 +283,11 @@ function updateInput () {
           currentCollision.mesh.material.map = tilledDirtTexture;
           currentCollision.mesh.material.needsUpdate = true;
           createPlant(currentCollision.position);
+     }
+     for (var i = 0; i < toolKeys.length; i++) {
+          if (keyboard.down((i + 1) + "")) {
+               player.equipTool(i);
+          }
      }
 }
 

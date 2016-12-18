@@ -31,6 +31,13 @@ var currentCollision = null;
 var roughDirtTexture;
 var tilledDirtTexture;
 var plantTexture;
+var metalTexture;
+var woodTexture;
+var seedTexture;
+var basketTexture;
+
+var basket;
+
 var playerWasWalking = false;
 
 var images = {};
@@ -57,6 +64,10 @@ function initTextures () {
      roughDirtTexture = THREE.ImageUtils.loadTexture("img/dirt.jpg");
      tilledDirtTexture = THREE.ImageUtils.loadTexture("img/tilled-dirt.jpg");
      plantTexture = THREE.ImageUtils.loadTexture("img/plant.jpg");
+     metalTexture = THREE.ImageUtils.loadTexture("img/metal.jpg");
+     woodTexture = THREE.ImageUtils.loadTexture("img/wood.jpg");
+     seedTexture = THREE.ImageUtils.loadTexture("img/seeds.jpg");
+     basketTexture = THREE.ImageUtils.loadTexture("img/wicker.jpg");
 }
 
 function initScene () {
@@ -75,6 +86,16 @@ function initCamera () {
      camera.position.z = 1.5;
 }
 
+function initTools () {
+     var loader = new THREE.JSONLoader();
+     loader.load('models/basket.json',
+     function(geometry) {
+        var basketModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:basketTexture}));
+        basket = WorldObject.objectFromMesh(basketModel);
+        basket.position.y += 10;
+     });
+}
+
 function initPlayer () {
      var inventory = new Inventory(this, inventoryPanel);
      player = new Player(scene, camera, worldCanvas, uiCanvas,
@@ -83,6 +104,7 @@ function initPlayer () {
      var loader = new THREE.JSONLoader();
      // Rest of the body loaded throw a series of callbacks (async):
      initPlayerBody(loader, material);
+     initTools();
 }
 
 function initPlayerBody (loader, material) {

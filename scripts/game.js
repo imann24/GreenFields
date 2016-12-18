@@ -37,6 +37,9 @@ var seedTexture;
 var basketTexture;
 
 var basket;
+var hoe;
+var wateringCan;
+var seeds;
 
 var playerWasWalking = false;
 
@@ -88,11 +91,25 @@ function initCamera () {
 
 function initTools () {
      var loader = new THREE.JSONLoader();
+     loader.load('models/seeds.json',
+     function(geometry) {
+        var seedsModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:seedTexture, side:THREE.DoubleSide}));
+        seeds = new WorldObject.objectFromMesh(world, seedsModel);
+     });
+     loader.load('models/hoe.json',
+     function(geometry) {
+        var hoeModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:woodTexture, side:THREE.DoubleSide}));
+        hoe = new WorldObject.objectFromMesh(world, hoeModel);
+     });
+     loader.load('models/watering-can.json',
+     function(geometry) {
+        var wateringCanModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:metalTexture, side:THREE.DoubleSide}));
+        wateringCan = new WorldObject.objectFromMesh(world, wateringCanModel);
+     });
      loader.load('models/basket.json',
      function(geometry) {
-        var basketModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:basketTexture}));
-        basket = WorldObject.objectFromMesh(basketModel);
-        basket.position.y += 10;
+        var basketModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:basketTexture, side:THREE.DoubleSide}));
+        basket = new WorldObject.objectFromMesh(world, basketModel);
      });
 }
 
@@ -134,6 +151,7 @@ function initLeftArm (loader, material, torso) {
                var lowerLeftArmModel = new THREE.Mesh(geometry, material);
                lowerLeftArm = WorldObject.objectFromMesh(world, lowerLeftArmModel);
                leftArm.addChild(lowerLeftArm);
+               leftArm.lower = lowerLeftArm;
                lowerLeftArm.position.y -= 1;
                lowerLeftArm.position.x += 0.125;
                initRightArm(loader, material, torso, leftArm);
@@ -154,6 +172,7 @@ function initRightArm (loader, material, torso, leftArm) {
                var lowerRightArmModel = new THREE.Mesh(geometry, material);
                lowerRightArm = WorldObject.objectFromMesh(world, lowerRightArmModel);
                rightArm.addChild(lowerRightArm);
+               rightArm.lower = lowerRightArm;
                lowerRightArm.position.y -= 1;
                lowerRightArm.position.x -= 0.125;
                initLeftLeg(loader, material, torso, leftArm, rightArm);
@@ -175,6 +194,7 @@ function initLeftLeg (loader, material, torso, leftArm, rightArm) {
                var lowerLeftLegModel = new THREE.Mesh(geometry, material);
                lowerLeftLeg = WorldObject.objectFromMesh(world, lowerLeftLegModel);
                leftLeg.addChild(lowerLeftLeg);
+               leftLeg.lower = lowerLeftLeg;
                lowerLeftLeg.position.y -= 0.85;
                lowerLeftLeg.position.z += 0.05;
                lowerLeftLeg.position.x -= 0.1;
@@ -197,6 +217,7 @@ function initRightLeg (loader, material, torso, leftArm, rightArm, leftLeg) {
                var lowerRightLegModel = new THREE.Mesh(geometry, material);
                lowerRightLeg = WorldObject.objectFromMesh(world, lowerRightLegModel);
                rightLeg.addChild(lowerRightLeg);
+               rightLeg.lower = lowerRightLeg;
                lowerRightLeg.position.y -= 0.85;
                lowerRightLeg.position.z += 0.05;
                lowerRightLeg.position.x += 0.125;
@@ -224,6 +245,50 @@ function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      player.setupMouseLook(torso.mesh);
      body.position.y -= 0.25;
      torso.addCollider();
+     arms.leftLimb.lower.addChild(hoe);
+     arms.leftLimb.lower.addChild(seeds);
+     arms.leftLimb.lower.addChild(wateringCan);
+     arms.leftLimb.lower.addChild(basket);
+     basket.position = new THREE.Vector3(0, 0, 0);
+     basket.position.x += 0.1;
+     basket.position.y -= 2.25;
+     basket.position.z += 0.25;
+     hoe.scale.x = 0.5;
+     hoe.scale.y = 0.5;
+     hoe.scale.z = 0.5;
+     seeds.scale.x = 0.5;
+     seeds.scale.y = 0.5;
+     seeds.scale.z = 0.5;
+     seeds.position.x -= 0.1;
+     seeds.position.y -= 1.75;
+     seeds.position.z += 0.25;
+     wateringCan.scale.x = 0.5;
+     wateringCan.scale.y = 0.5;
+     wateringCan.scale.z = 0.5;
+     basket.scale.x = 0.5;
+     basket.scale.y = 0.5;
+     basket.scale.z = 0.5;
+     hoe.rotation.x = Math.PI / 2;
+     hoe.rotation.y = Math.PI;
+     hoe.position.y -= 1.5;
+     hoe.position.x -= 0.15;
+     hoe.position.z += 0.5
+     wateringCan.rotation.y = Math.PI;
+     wateringCan.position.x -= 0.1;
+     wateringCan.position.y -= 2;
+     wateringCan.position.z += 1.25;
+     hoe.setVisible(false);
+     seeds.setVisible(false);
+     wateringCan.setVisible(false);
+     basket.setVisible(false);
+     hoe.setId(hoeKey);
+     seeds.setId(seedsKey);
+     wateringCan.setId(wateringCanKey);
+     basket.setId(basketKey);
+     player.addToInventory(hoe);
+     player.addToInventory(seeds);
+     player.addToInventory(wateringCan);
+     player.addToInventory(basket);
 }
 
 function createPlant (position) {

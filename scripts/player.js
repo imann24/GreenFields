@@ -74,12 +74,11 @@ Player.prototype.useTool = function (target) {
      }
 }
 
+Player.prototype.addToInventory = function (item) {
+     this.inventory.add(item);
+}
+
 Player.prototype.setupMouseLook = function (target) {
-    // this.pointerLook = new THREE.PointerLockControls(target);
-    // this.scene.add(this.pointerLook.getObject());
-    // this.pointerLook.enabled = true;
-    // Accounts for the offset of adding the camera to the controls parent
-    // target.position.y -= 5;
     this.leftBound = this.uiCanvas.width / 4;
     this.rightBound = 3 * this.uiCanvas.width / 4;
     this.turningLeft = false;

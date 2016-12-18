@@ -111,7 +111,7 @@ UIText.prototype = new UIElement();
 
 UIText.prototype.drawElement = function (graphics, color) {
      var o = this.origin;
-     graphics.clearRect(0, 0, 100, 100);
+     graphics.clearRect(0, 0, 200, 100);
      graphics.fillStyle = this.controller.textColor;
      graphics.fillText(this.text, o.x, o.y);
 }

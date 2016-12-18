@@ -21,6 +21,7 @@ function Player (scene, camera, glCanvas, uiCanvas, speed, strafeSpeed, lookSpee
      this.yLook = 0;
      this.xLook = 0;
      this.equippedTool = null;
+     this.money = 0;
      this.setup();
 }
 
@@ -71,6 +72,15 @@ Player.prototype.hasToolEquipped = function () {
 Player.prototype.useTool = function (target) {
      if (target.respondsTo(this.equippedTool)) {
           this.equippedTool.use(target);
+     }
+}
+
+Player.prototype.getToolId = function () {
+     var tool = this.inventory.getSelected();
+     if (tool) {
+          return tool.getId();
+     } else {
+          return null;
      }
 }
 
@@ -182,4 +192,12 @@ Player.prototype.applyRotation = function (axisKey, delta) {
      }
      vector.applyAxisAngle(axis, angle);
      this.body.rotation.setFromVector3(vector);
+}
+
+Player.prototype.collect = function (value) {
+     this.money += value;
+}
+
+Player.prototype.getMoneyString = function () {
+     return "$" + this.money + ".00";
 }

@@ -12,6 +12,7 @@ var gridPositions;
 // UI
 var userInterface;
 var inventoryPanel;
+var moneyText;
 
 // World Objects
 var world;
@@ -93,7 +94,7 @@ function initTools () {
      var loader = new THREE.JSONLoader();
      loader.load('models/seeds.json',
      function(geometry) {
-        var seedsModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:seedTexture, side:THREE.DoubleSide}));
+        var seedsModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:plantTexture, side:THREE.DoubleSide}));
         seeds = new WorldObject.objectFromMesh(world, seedsModel);
      });
      loader.load('models/hoe.json',
@@ -291,17 +292,19 @@ function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      player.addToInventory(basket);
 }
 
-function createPlant (position) {
+function createPlant (owner, position) {
      var loader = new THREE.JSONLoader();
      var material = new THREE.MeshLambertMaterial({ map: plantTexture});
      loader.load('models/sprout.json',
      function(geometry) {
-        var sprout = new THREE.Mesh(geometry, material);
-        sprout.scale.y = 0.25;
-        sprout.position.y -= 4;
-        sprout.position.x = position.x;
-        sprout.position.z = position.z;
-        scene.add(sprout);
+        var sproutMesh = new THREE.Mesh(geometry, material);
+        sproutMesh.scale.y = 0.25;
+        sproutMesh.position.y -= 4;
+        sproutMesh.position.x = position.x;
+        sproutMesh.position.z = position.z;
+        var sprout = new WorldObject.objectFromMesh(world, sproutMesh);
+        owner.plant = sprout;
+        sprout.setVisible(false);
      });
 }
 
@@ -330,9 +333,11 @@ function initFarm () {
 
 function initUserInterface () {
      uiCanvas = document.getElementById("uicanvas");
-     userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"), "black");
+     userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"), "black", "white");
      inventoryPanel = new InventoryPanel(userInterface, new Vector2(0, 500), new Vector2(800, 100), images);
+     moneyText = new UIText(userInterface, new Vector2(25, 50),  "$0.00");
      userInterface.add(inventoryPanel);
+     userInterface.add(moneyText);
 }
 
 function tryInitWebGL () {
@@ -367,9 +372,17 @@ function update() {
 function updateInput () {
      player.move();
      if (keyboard.down("F") && currentCollision) {
-          currentCollision.mesh.material.map = tilledDirtTexture;
-          currentCollision.mesh.material.needsUpdate = true;
-          createPlant(currentCollision.position);
+          if (!currentCollision.tilled && player.getToolId() == hoeKey) {
+               currentCollision.mesh.material.map = tilledDirtTexture;
+               currentCollision.mesh.material.needsUpdate = true;
+               currentCollision.tilled = true;
+          } else if (currentCollision.tilled && player.getToolId() == seedsKey && !currentCollision.isPlantVisible()) {
+               currentCollision.setPlantVisible(true);
+          } else if (currentCollision.isPlantVisible() && player.getToolId() == wateringCanKey) {
+               currentCollision.growPlant();
+          } else if (currentCollision.isPlantVisible() && player.getToolId() == basketKey) {
+               player.collect(currentCollision.pickPlant());
+          }
      }
      for (var i = 0; i < toolKeys.length; i++) {
           if (keyboard.down((i + 1) + "")) {
@@ -397,6 +410,7 @@ function updateRenderer () {
 }
 
 function updateUserInterface () {
+     moneyText.setText(player.getMoneyString());
      userInterface.draw();
 }
  //----------------------------------------------------------------------------------

@@ -380,9 +380,50 @@ Plane.createGrid = function (world, gridPositions, scale, texturePath, angle) {
                plane.setPosition(gridPositions[x][z]);
                plane.addCollider();
                plane.setId("Tile: (" + x + ", " + z + ")");
+               createPlant(plane, plane.position);''
+               plane.tilled = false;
+               plane.plantValue = 1;
+               plane.startingPlantHeight = 0.25;
           }
      }
      return parent;
+}
+
+Plane.prototype.setPlantVisible = function (isVisible) {
+     if (this.plant) {
+          this.plant.setVisible(isVisible);
+     }
+}
+
+Plane.prototype.isPlantVisible = function () {
+     if (this.plant) {
+          return this.plant.visible;
+     } else {
+          return false;
+     }
+}
+
+Plane.prototype.growPlant = function () {
+     if (this.plant) {
+          this.plantValue++;
+          this.plant.scale.y+=this.startingPlantHeight;
+     }
+}
+
+Plane.prototype.getPlantValue = function () {
+     if (this.plantValue) {
+          return this.plantValue;
+     } else {
+          return 0;
+     }
+}
+
+Plane.prototype.pickPlant = function () {
+     var valueGained = this.plantValue;
+     this.plantValue = 1;
+     this.plant.scale.y = this.startingPlantHeight;
+     this.setPlantVisible(false);
+     return valueGained;
 }
 
 function Cube (world, origin, scale, color) {

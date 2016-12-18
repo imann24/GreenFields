@@ -36,3 +36,7 @@ Inventory.prototype.deselect = function () {
      }
      this.uiPanel.deselect();
 }
+
+Inventory.prototype.getSelected = function () {
+     return this.selected;
+}

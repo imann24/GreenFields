@@ -3,10 +3,11 @@
  * @desc: Manages the user interface of the game
  */
 
-function UserInterface (canvas, graphics, color) {
+function UserInterface (canvas, graphics, color, textColor) {
      this.canvas = canvas;
      this.graphics = graphics;
      this.color = color;
+     this.textColor = textColor;
      this.elements = [];
 }
 
@@ -97,6 +98,27 @@ UIPanel.prototype.select = function (selectedIndex) {
 
 UIPanel.prototype.deselect = function () {
      this.selectedIndex = NULL_INDEX;
+}
+
+function UIText (controller, origin, text) {
+     this.controller = controller;
+     this.origin = origin;
+     this.text = text;
+     this.lastText = "";
+}
+
+UIText.prototype = new UIElement();
+
+UIText.prototype.drawElement = function (graphics, color) {
+     var o = this.origin;
+     graphics.clearRect(0, 0, 100, 100);
+     graphics.fillStyle = this.controller.textColor;
+     graphics.fillText(this.text, o.x, o.y);
+}
+
+UIText.prototype.setText = function (newText) {
+     this.lastText = this.text;
+     this.text = newText;
 }
 
 function InventoryPanel (controller, origin, size, imageLookup) {

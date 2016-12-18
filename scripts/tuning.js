@@ -12,7 +12,7 @@ var leftLegStartForward = true;
 var leftArmStartForward = false;
 var framesPerStep = 40;
 
-var godModeEnabled = true;
+var godModeEnabled = false;
 
 var cameraY = 10;
 var cameraZ = 20;
@@ -28,8 +28,8 @@ var textureYRepeat = 5;
 var textureXRepeat = 20;
 
 // Farm grid vars:
-var gridMin = -200;
-var gridMax = 200;
+var gridMin = -50;
+var gridMax = 50;
 var gridStep = 5;
 
 // Tools

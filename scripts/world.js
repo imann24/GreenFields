@@ -82,6 +82,13 @@ WorldObject.prototype = {
      get scale () {
           return this.mesh.scale;
      },
+     get visible () {
+          return this.mesh.visible;
+     },
+}
+
+WorldObject.prototype.setVisible = function (isVisible) {
+     this.mesh.visible = isVisible;
 }
 
 // Static constructor to create an object from an already created mesh

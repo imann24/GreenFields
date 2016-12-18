@@ -4,20 +4,23 @@
  * @requires: THREE.js, KeyboardState.js, PointerLockControls.js
  */
 
-function Player (scene, camera, canvas, speed, strafeSpeed, lookSpeed) {
+function Player (scene, camera, glCanvas, uiCanvas, speed, strafeSpeed, lookSpeed, inventory) {
      this.scene = scene;
      this.camera = camera;
-     this.canvas = canvas;
+     this.glCanvas = glCanvas;
+     this.uiCanvas = uiCanvas;
      this.speed = speed;
      // For sideways movement:
      this.strafeSpeed = strafeSpeed;
      this.lookSpeed = lookSpeed;
+     this.inventory = inventory;
      this.xSpeed = 0;
      this.zSpeed = 0;
      this.zRotation = 0;
      this.yRotation = 0;
      this.yLook = 0;
      this.xLook = 0;
+     this.equippedTool = null;
      this.setup();
 }
 
@@ -53,17 +56,8 @@ Player.prototype.stop = function () {
      this.body.resetLimbs();
 }
 
-Player.prototype.setupInventory = function () {
-     this.inventory = [];
-     this.equippedTool = null;
-}
-
 Player.prototype.equipTool = function (indexInInventory) {
-     if (indexInInventory >= 0 && indexInInventory < inventory.length) {
-          if (inventory[indexInInventory].isTool()) {
-               this.equippedTool = inventory[indexInInventory];
-          }
-     }
+     this.inventory.select(indexInInventory);
 }
 
 Player.prototype.unequipTool = function () {
@@ -80,19 +74,18 @@ Player.prototype.useTool = function (target) {
      }
 }
 
+Player.prototype.addToInventory = function (item) {
+     this.inventory.add(item);
+}
+
 Player.prototype.setupMouseLook = function (target) {
-    // this.pointerLook = new THREE.PointerLockControls(target);
-    // this.scene.add(this.pointerLook.getObject());
-    // this.pointerLook.enabled = true;
-    // Accounts for the offset of adding the camera to the controls parent
-    // target.position.y -= 5;
-    this.leftBound = this.canvas.width / 4;
-    this.rightBound = 3 * this.canvas.width / 4;
+    this.leftBound = this.uiCanvas.width / 4;
+    this.rightBound = 3 * this.uiCanvas.width / 4;
     this.turningLeft = false;
     this.turningRight = false;
     var player = this;
-    this.canvas.addEventListener('mousemove', function(event) {
-      var mousePosition = Input.getMousePosition(player.canvas, event);
+    this.uiCanvas.addEventListener('mousemove', function(event) {
+      var mousePosition = Input.getMousePosition(player.uiCanvas, event);
       player.turningLeft = false;
       player.turningRight = false;
       if (mousePosition.x < player.leftBound) {

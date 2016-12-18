@@ -11,6 +11,7 @@ var gridPositions;
 
 // UI
 var userInterface;
+var inventoryPanel;
 
 // World Objects
 var world;
@@ -30,13 +31,26 @@ var currentCollision = null;
 var roughDirtTexture;
 var tilledDirtTexture;
 var plantTexture;
+var metalTexture;
+var woodTexture;
+var seedTexture;
+var basketTexture;
+
+var basket;
+var hoe;
+var wateringCan;
+var seeds;
+
 var playerWasWalking = false;
+
+var images = {};
 
 // Create the scene. This function is called once, as soon as the page loads.
 // The renderer has already been created before this function is called.
 function initWorld() {
      // These functions should be called in the following order in order to guarantee dependency initialization
      initTextures();
+     initUserInterface();
      initScene();
      world = new World(scene);
      initInput();
@@ -47,9 +61,16 @@ function initWorld() {
 }
 
 function initTextures () {
+     for (var i = 0; i < toolKeys.length; i++) {
+          images[toolKeys[i]] = document.getElementById(toolKeys[i]);
+     }
      roughDirtTexture = THREE.ImageUtils.loadTexture("img/dirt.jpg");
      tilledDirtTexture = THREE.ImageUtils.loadTexture("img/tilled-dirt.jpg");
      plantTexture = THREE.ImageUtils.loadTexture("img/plant.jpg");
+     metalTexture = THREE.ImageUtils.loadTexture("img/metal.jpg");
+     woodTexture = THREE.ImageUtils.loadTexture("img/wood.jpg");
+     seedTexture = THREE.ImageUtils.loadTexture("img/seeds.jpg");
+     basketTexture = THREE.ImageUtils.loadTexture("img/wicker.jpg");
 }
 
 function initScene () {
@@ -68,13 +89,39 @@ function initCamera () {
      camera.position.z = 1.5;
 }
 
+function initTools () {
+     var loader = new THREE.JSONLoader();
+     loader.load('models/seeds.json',
+     function(geometry) {
+        var seedsModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:seedTexture, side:THREE.DoubleSide}));
+        seeds = new WorldObject.objectFromMesh(world, seedsModel);
+     });
+     loader.load('models/hoe.json',
+     function(geometry) {
+        var hoeModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:woodTexture, side:THREE.DoubleSide}));
+        hoe = new WorldObject.objectFromMesh(world, hoeModel);
+     });
+     loader.load('models/watering-can.json',
+     function(geometry) {
+        var wateringCanModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:metalTexture, side:THREE.DoubleSide}));
+        wateringCan = new WorldObject.objectFromMesh(world, wateringCanModel);
+     });
+     loader.load('models/basket.json',
+     function(geometry) {
+        var basketModel = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map:basketTexture, side:THREE.DoubleSide}));
+        basket = new WorldObject.objectFromMesh(world, basketModel);
+     });
+}
+
 function initPlayer () {
-     player = new Player(scene, camera, worldCanvas,
-          playerSpeed, playerStrafeSpeed, playerLookSpeed);
+     var inventory = new Inventory(this, inventoryPanel);
+     player = new Player(scene, camera, worldCanvas, uiCanvas,
+          playerSpeed, playerStrafeSpeed, playerLookSpeed, inventory);
      var material = new THREE.MeshLambertMaterial({ map: THREE.ImageUtils.loadTexture("img/wood.jpg")});
      var loader = new THREE.JSONLoader();
      // Rest of the body loaded throw a series of callbacks (async):
      initPlayerBody(loader, material);
+     initTools();
 }
 
 function initPlayerBody (loader, material) {
@@ -104,6 +151,7 @@ function initLeftArm (loader, material, torso) {
                var lowerLeftArmModel = new THREE.Mesh(geometry, material);
                lowerLeftArm = WorldObject.objectFromMesh(world, lowerLeftArmModel);
                leftArm.addChild(lowerLeftArm);
+               leftArm.lower = lowerLeftArm;
                lowerLeftArm.position.y -= 1;
                lowerLeftArm.position.x += 0.125;
                initRightArm(loader, material, torso, leftArm);
@@ -124,6 +172,7 @@ function initRightArm (loader, material, torso, leftArm) {
                var lowerRightArmModel = new THREE.Mesh(geometry, material);
                lowerRightArm = WorldObject.objectFromMesh(world, lowerRightArmModel);
                rightArm.addChild(lowerRightArm);
+               rightArm.lower = lowerRightArm;
                lowerRightArm.position.y -= 1;
                lowerRightArm.position.x -= 0.125;
                initLeftLeg(loader, material, torso, leftArm, rightArm);
@@ -145,6 +194,7 @@ function initLeftLeg (loader, material, torso, leftArm, rightArm) {
                var lowerLeftLegModel = new THREE.Mesh(geometry, material);
                lowerLeftLeg = WorldObject.objectFromMesh(world, lowerLeftLegModel);
                leftLeg.addChild(lowerLeftLeg);
+               leftLeg.lower = lowerLeftLeg;
                lowerLeftLeg.position.y -= 0.85;
                lowerLeftLeg.position.z += 0.05;
                lowerLeftLeg.position.x -= 0.1;
@@ -167,6 +217,7 @@ function initRightLeg (loader, material, torso, leftArm, rightArm, leftLeg) {
                var lowerRightLegModel = new THREE.Mesh(geometry, material);
                lowerRightLeg = WorldObject.objectFromMesh(world, lowerRightLegModel);
                rightLeg.addChild(lowerRightLeg);
+               rightLeg.lower = lowerRightLeg;
                lowerRightLeg.position.y -= 0.85;
                lowerRightLeg.position.z += 0.05;
                lowerRightLeg.position.x += 0.125;
@@ -179,7 +230,7 @@ function initRightLeg (loader, material, torso, leftArm, rightArm, leftLeg) {
 function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      // camera.rotation.x -= Math.PI / 4;
      camera.position.z -= 7.5;
-     camera.position.y += 6;
+     camera.position.y += 4;
      torso.rotation.x += Math.PI / 4;
      torso.position.z -= 4;
      // camera.rotation.z += Math.PI;
@@ -194,6 +245,50 @@ function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      player.setupMouseLook(torso.mesh);
      body.position.y -= 0.25;
      torso.addCollider();
+     arms.leftLimb.lower.addChild(hoe);
+     arms.leftLimb.lower.addChild(seeds);
+     arms.leftLimb.lower.addChild(wateringCan);
+     arms.leftLimb.lower.addChild(basket);
+     basket.position = new THREE.Vector3(0, 0, 0);
+     basket.position.x += 0.1;
+     basket.position.y -= 2.25;
+     basket.position.z += 0.25;
+     hoe.scale.x = 0.5;
+     hoe.scale.y = 0.5;
+     hoe.scale.z = 0.5;
+     seeds.scale.x = 0.5;
+     seeds.scale.y = 0.5;
+     seeds.scale.z = 0.5;
+     seeds.position.x -= 0.1;
+     seeds.position.y -= 1.75;
+     seeds.position.z += 0.25;
+     wateringCan.scale.x = 0.5;
+     wateringCan.scale.y = 0.5;
+     wateringCan.scale.z = 0.5;
+     basket.scale.x = 0.5;
+     basket.scale.y = 0.5;
+     basket.scale.z = 0.5;
+     hoe.rotation.x = Math.PI / 2;
+     hoe.rotation.y = Math.PI;
+     hoe.position.y -= 1.5;
+     hoe.position.x -= 0.15;
+     hoe.position.z += 0.5
+     wateringCan.rotation.y = Math.PI;
+     wateringCan.position.x -= 0.1;
+     wateringCan.position.y -= 2;
+     wateringCan.position.z += 1.25;
+     hoe.setVisible(false);
+     seeds.setVisible(false);
+     wateringCan.setVisible(false);
+     basket.setVisible(false);
+     hoe.setId(hoeKey);
+     seeds.setId(seedsKey);
+     wateringCan.setId(wateringCanKey);
+     basket.setId(basketKey);
+     player.addToInventory(hoe);
+     player.addToInventory(seeds);
+     player.addToInventory(wateringCan);
+     player.addToInventory(basket);
 }
 
 function createPlant (position) {
@@ -234,8 +329,10 @@ function initFarm () {
 }
 
 function initUserInterface () {
-     userInterface = new UserInterface(uicanvas);
      uiCanvas = document.getElementById("uicanvas");
+     userInterface = new UserInterface(uicanvas, uiCanvas.getContext("2d"), "black");
+     inventoryPanel = new InventoryPanel(userInterface, new Vector2(0, 500), new Vector2(800, 100), images);
+     userInterface.add(inventoryPanel);
 }
 
 function tryInitWebGL () {
@@ -264,6 +361,7 @@ function update() {
      updatePhysics();
      updateInput();
      updateRenderer();
+     updateUserInterface();
 }
 
 function updateInput () {
@@ -272,6 +370,11 @@ function updateInput () {
           currentCollision.mesh.material.map = tilledDirtTexture;
           currentCollision.mesh.material.needsUpdate = true;
           createPlant(currentCollision.position);
+     }
+     for (var i = 0; i < toolKeys.length; i++) {
+          if (keyboard.down((i + 1) + "")) {
+               player.equipTool(i);
+          }
      }
 }
 
@@ -293,6 +396,9 @@ function updateRenderer () {
      }
 }
 
+function updateUserInterface () {
+     userInterface.draw();
+}
  //----------------------------------------------------------------------------------
 
  // The init() function is called by the onload event when the document has loaded.
@@ -300,7 +406,6 @@ function init() {
      if (tryInitWebGL()) {
           // create world and render scene
           initWorld();
-          initUserInterface();
           // Must be called once from init to begin render loop:
      }
 }

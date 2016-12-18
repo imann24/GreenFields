@@ -12,7 +12,7 @@ var leftLegStartForward = true;
 var leftArmStartForward = false;
 var framesPerStep = 40;
 
-var godModeEnabled = false;
+var godModeEnabled = true;
 
 var cameraY = 10;
 var cameraZ = 20;
@@ -37,7 +37,7 @@ var hoeKey = "Hoe";
 var seedsKey = "Seeds";
 var wateringCanKey = "Watering Can";
 var basketKey = "Basket";
-
+var toolKeys = [hoeKey, seedsKey, wateringCanKey, basketKey];
 // Farm Items
 var plantKey = "Plant";
 var farmTileKey = "Farm Tile";

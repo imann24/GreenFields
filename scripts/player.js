@@ -179,6 +179,14 @@ Player.prototype.applyMove = function (axis, velocity) {
      }
 }
 
+Player.prototype.useTool = function () {
+     this.body.useTool();
+}
+
+Player.prototype.interact = function () {
+     this.body.interact();
+}
+
 Player.prototype.applyRotation = function (axisKey, delta) {
      var vector = new THREE.Vector3(1, 0, 0);
      var angle;

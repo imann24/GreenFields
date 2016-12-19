@@ -238,9 +238,9 @@ function initPlayerFinal (torso, leftArm, rightArm, leftLeg, rightLeg) {
      camera.rotation.y += Math.PI;
      camera.rotation.x += Math.PI / 8;
      var arms = new LimbPair(leftArm, rightArm);
-     arms.setMovement(framesPerStep, maxArmAngle, leftArmStartForward);
+     arms.setMovement(framesPerStep, maxArmAngle, leftArmStartForward, true, false);
      var legs = new LimbPair(leftLeg, rightLeg);
-     legs.setMovement(framesPerStep, maxLegAngle, leftLegStartForward);
+     legs.setMovement(framesPerStep, maxLegAngle, leftLegStartForward, false, true);
      var body = new Body(torso, arms, legs);
      player.setBody(body);
      player.setupMouseLook(torso.mesh);
@@ -376,12 +376,16 @@ function updateInput () {
                currentCollision.mesh.material.map = tilledDirtTexture;
                currentCollision.mesh.material.needsUpdate = true;
                currentCollision.tilled = true;
+               player.useTool();
           } else if (currentCollision.tilled && player.getToolId() == seedsKey && !currentCollision.isPlantVisible()) {
                currentCollision.setPlantVisible(true);
+               player.useTool();
           } else if (currentCollision.isPlantVisible() && player.getToolId() == wateringCanKey) {
                currentCollision.growPlant();
+               player.useTool();
           } else if (currentCollision.isPlantVisible() && player.getToolId() == basketKey) {
                player.collect(currentCollision.pickPlant());
+               player.useTool();
           }
      }
      for (var i = 0; i < toolKeys.length; i++) {
@@ -407,6 +411,7 @@ function updateRenderer () {
           player.stop();
           playerWasWalking = false;
      }
+     player.interact();
 }
 
 function updateUserInterface () {

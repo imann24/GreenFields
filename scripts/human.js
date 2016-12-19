@@ -16,23 +16,38 @@ function Leg (upper, lower) {
 
 Leg.prototype = new Limb();
 
+Leg.prototype.isLeg = function () {
+     return true;
+}
+
 function Arm (upper, lower) {
      this.setup(upper, lower);
 }
 
 Arm.prototype = new Limb();
 
+Arm.prototype.isArm = function () {
+     return true;
+}
+
 function LimbPair (leftLimb, rightLimb) {
      this.leftLimb = leftLimb;
      this.rightLimb = rightLimb;
+     this[0] = leftLimb;
+     this[1] = rightLimb;
+     this.length = 2;
 }
 
-LimbPair.prototype.setMovement = function (framesPerStep, maxAngle, leftForward) {
+LimbPair.prototype.setMovement = function (framesPerStep, maxAngle, leftForward, isArm, isLeg) {
      this.framesPerStep = framesPerStep;
      this.maxAngle = maxAngle;
      this.currentFrameInStep = 0;
      this.leftForward = leftForward;
      this.setLimbDirection();
+     for (var i = 0; i < this.length; i++) {
+          this[i].isArm = isArm;
+          this[i].isLeg = isLeg;
+     }
 }
 
 LimbPair.prototype.setLimbDirection = function () {
@@ -65,27 +80,70 @@ LimbPair.prototype.updateMovement = function () {
 }
 
 LimbPair.prototype.resetMovement = function () {
-     this.leftLimb.rotation.x = 0;
-     this.rightLimb.rotation.x = 0;
+     if (!this.leftLimb.inUse) {
+          this.leftLimb.rotation.x = 0;
+          this.leftLimb.lower.rotation.x = 0;
+     }
+     if (!this.rightLimb.inUse) {
+          this.rightLimb.rotation.x = 0;
+          this.rightLimb.lower.rotation.x = 0;
+     }
      this.currentFrameInStep = 0;
 }
 
 // Extend progress is half of overall progress
 LimbPair.prototype.extendMovement = function (progress) {
-     this.forwardLimb.rotation.x = Math.lerp(0, this.maxAngle, progress);
-     this.backLimb.rotation.x = Math.lerp(0, -this.maxAngle, progress);
+     if (!this.forwardLimb.inUse) {
+          var forwardRotation = Math.lerp(0, this.maxAngle, progress);
+          this.forwardLimb.rotation.x = forwardRotation;
+          if (this.forwardLimb.isArm) {
+               this.forwardLimb.lower.rotation.x = -forwardRotation * 2;
+          } else if (this.forwardLimb.isLeg) {
+               this.forwardLimb.lower.rotation.x = forwardRotation;
+          }
+     }
+
+     if (!this.backLimb.inUse) {
+          var backRotation = Math.lerp(0, -this.maxAngle, progress);
+          this.backLimb.rotation.x = backRotation;
+          if (this.backLimb.isArm){
+               this.backLimb.lower.rotation.x = backRotation * 2;
+          } else if (this.backLimb.isLeg) {
+               this.backLimb.lower.rotation.x = -backRotation * 2.5;
+          }
+     }
 }
 
 // Rectract progress is half of overall progress
 LimbPair.prototype.retractMovement = function (progress) {
-     this.forwardLimb.rotation.x = Math.lerp(this.maxAngle, 0, progress);
-     this.backLimb.rotation.x = Math.lerp(-this.maxAngle, 0, progress);
+     if (!this.forwardLimb.inUse) {
+          var forwardRotation = Math.lerp(this.maxAngle, 0, progress);
+          this.forwardLimb.rotation.x = forwardRotation;
+          if (this.forwardLimb.isArm) {
+               this.forwardLimb.lower.rotation.x = -forwardRotation * 2
+          } else if (this.forwardLimb.isLeg) {
+               this.forwardLimb.lower.rotation.x = forwardRotation;
+          }
+     }
+
+     if (!this.backLimb.inUse) {
+          var backRotation = Math.lerp(-this.maxAngle, 0, progress);
+          this.backLimb.rotation.x = backRotation;
+          if (this.backLimb.isArm) {
+               this.backLimb.lower.rotation.x = backRotation * 2;
+          } else if (this.backLimb.isLeg) {
+               this.backLimb.lower.rotation.x = -backRotation * 2.5;
+          }
+     }
 }
 
 function Body (torso, arms, legs) {
      this.torso = torso;
      this.arms = arms;
      this.legs = legs;
+     this.useToolAnimationFrame = 0;
+     this.usingTool = false;
+     this.framesInToolAnimation = 48;
 }
 
 Body.prototype = {
@@ -104,6 +162,12 @@ Body.prototype = {
 Body.prototype.walk = function () {
      this.arms.updateMovement();
      this.legs.updateMovement();
+}
+
+Body.prototype.interact = function () {
+     if (this.usingTool) {
+          this.updateToolMovement();
+     }
 }
 
 Body.prototype.resetLimbs = function () {
@@ -133,4 +197,27 @@ Body.prototype.getId = function () {
 
 Body.prototype.setId = function (id) {
      this.torso.setId(id);
+}
+
+Body.prototype.useTool = function () {
+     this.arms.leftLimb.inUse = true;
+     this.useToolAnimationFrame = 0;
+     this.usingTool = true;
+}
+
+Body.prototype.updateToolMovement = function () {
+     var progress = this.useToolAnimationFrame / this.framesInToolAnimation;
+     this.arms.leftLimb.rotation.x = 0;
+     if (progress < 0.25) {
+          this.arms.leftLimb.lower.rotation.x = Math.lerp(0, -Math.PI / 2, progress * 4);
+     } else if (progress >= 0.25 && progress < 0.75) {
+          this.arms.leftLimb.lower.rotation.x = Math.lerp(-Math.PI / 2, Math.PI / 2, (progress - 0.25) * 2);
+     } else if (progress <= 1.0) {
+          this.arms.leftLimb.lower.rotation.x = Math.lerp(Math.PI / 2, 0, (progress - 0.75) * 4);
+     }
+     this.useToolAnimationFrame++;
+     if (this.useToolAnimationFrame > this.framesInToolAnimation) {
+          this.usingTool = false;
+          this.arms.leftLimb.inUse = false;
+     }
 }

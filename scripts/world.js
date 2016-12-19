@@ -384,6 +384,7 @@ Plane.createGrid = function (world, gridPositions, scale, texturePath, angle) {
                plane.tilled = false;
                plane.plantValue = 1;
                plane.startingPlantHeight = 0.25;
+               plane.startingPlantWidth = 1;
           }
      }
      return parent;
@@ -406,7 +407,9 @@ Plane.prototype.isPlantVisible = function () {
 Plane.prototype.growPlant = function () {
      if (this.plant) {
           this.plantValue++;
-          this.plant.scale.y+=this.startingPlantHeight;
+          this.plant.scale.x += this.startingPlantHeight / 2;
+          this.plant.scale.y += this.startingPlantHeight;
+          this.plant.scale.z += this.startingPlantHeight / 2;
      }
 }
 
@@ -421,7 +424,9 @@ Plane.prototype.getPlantValue = function () {
 Plane.prototype.pickPlant = function () {
      var valueGained = this.plantValue;
      this.plantValue = 1;
+     this.plant.scale.x = this.startingPlantWidth;
      this.plant.scale.y = this.startingPlantHeight;
+     this.plant.scale.z = this.startingPlantWidth;
      this.setPlantVisible(false);
      return valueGained;
 }
@@ -467,18 +472,6 @@ function PlantObject (world, position, plantDescriptor) {
 }
 
 PlantObject.prototype = new ActiveFarmObject();
-
-PlantObject.prototype.plant = function () {
-     // TODO: Implement
-}
-
-PlantObject.prototype.pick = function () {
-     // TODO: Implement
-}
-
-PlantObject.prototype.water = function () {
-     // TODO: Implement
-}
 
 function FarmTile (world, position) {
      this.farmObjectSetup(world, position);
@@ -541,22 +534,6 @@ Tool.prototype.setupTool = function (world, owner, toolDescriptor) {
 
 Tool.prototype.use = function (target) {
      console.log("Override the USE method in subclasses of Tool");
-}
-
-Tool.prototype.till = function (farmTile) {
-     // TODO: Implement
-}
-
-Tool.prototype.plant = function (farmTile) {
-     // TODO: Implement
-}
-
-Tool.prototype.water = function (plantObject) {
-     // TODO: Implement
-}
-
-Tool.prototype.pick = function (plantObject) {
-     // TODO: Implement
 }
 
 function Hoe (world, owner, hoeDescriptor) {
